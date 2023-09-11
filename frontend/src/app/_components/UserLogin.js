@@ -3,7 +3,7 @@ const UserLogin = () => {
         <form className="flex flex-col gap-2">
             <div className="input-cont">
             <label htmlFor="username">Username</label>
-            <input type="text" id="username" className="custom-input"></input>
+            <input type="text" id="username" className="custom-input" autoComplete="off"></input>
             </div>
             <div className="input-cont">
             <label htmlFor="password">Password</label>
