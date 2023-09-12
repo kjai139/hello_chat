@@ -14,7 +14,8 @@ module.exports = {
       },
       fontFamily: {
         sans: ['var(--font-inter)'],
-        mono: ['var(--font-roboto)']
+        mono: ['var(--font-roboto)'],
+        josefin: ['var(--font-josefin)']
       },
       fontSize: {
         '2xl': '1.5rem',
