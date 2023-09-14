@@ -5,7 +5,7 @@ const UserSchema = new Schema({
     username: {
         type:String,
         required:true,
-        unique:true
+        unique: true
     },
     normalized_name: {
         type: String,
@@ -22,7 +22,6 @@ const UserSchema = new Schema({
     },
     email: {
         type: String,
-        required:true,
         unique:true
     }
 

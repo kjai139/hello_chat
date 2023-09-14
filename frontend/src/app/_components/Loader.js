@@ -7,10 +7,10 @@ const Spinner = ({isLoading}) => {
     return (
         <div className="overlay">
             <RotatingLines
-            strokeColor="grey"
+            strokeColor="black"
             strokeWidth="5"
             animationDuration="0.75"
-            width="96"
+            width="50"
             visible={isLoading}
             ></RotatingLines>
         </div>

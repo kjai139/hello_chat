@@ -1,8 +1,11 @@
-import './globals.css'
-import { Inter } from 'next/font/google'
 
-const inter = Inter({ 
+import '../app/globals.css'
+import { Montserrat } from 'next/font/google'
+
+const Monste = Montserrat({
   subsets: ['latin'],
+  preload: true,
+  display: 'swap',
   variable: '--font-inter'
 })
 
@@ -15,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans`}>{children}</body>
+      <body className={`${Monste.variable} font-sans`}>{children}</body>
     </html>
   )
 }

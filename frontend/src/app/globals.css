@@ -31,6 +31,11 @@
   animation-delay: 1s;
 }
 
+.hover-p:hover {
+  cursor: url('../../svgs/pointer.svg') 0 0, auto;
+  
+}
+
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -55,7 +60,7 @@
   }
 
   .overlay {
-    @apply z-0 absolute top-0 left-0 w-full h-full bg-black opacity-50;
+    @apply z-0 absolute top-0 left-0 w-full h-full bg-transparent justify-center flex;
   }
 
   
