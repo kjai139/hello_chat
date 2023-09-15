@@ -6,7 +6,9 @@ import axiosInstance from '../../../axios'
 import Spinner from "./Loader"
 import ResultModal from "./modals/resultModal"
 import { Josefin_Sans } from "next/font/google"
-
+import { userPasswordValidationSchema, userValidationScehma } from "../_schemas/authSchemas"
+import * as yup from 'yup'
+import { useRouter } from "next/navigation"
 
 const Josefin = Josefin_Sans({
     subsets: ['latin'],
@@ -25,6 +27,8 @@ const UserLogin = () => {
     const [password, setPassword] = useState('')
     const [resultMsg, setResultMsg] = useState('')
 
+    const router = useRouter()
+
     const handleCreateAcc = (e) => {
         e.preventDefault()
         setIsUserCreatingAcc(true)
@@ -39,6 +43,48 @@ const UserLogin = () => {
         setPassword('')
     }
 
+    const loginUser = async (e) => {
+        e.preventDefault()
+        setIsLoading(true)
+        try {
+            const response = await axiosInstance.post('/api/account/login', {
+                username: username,
+                password: password
+            }, {
+                withCredentials: true
+            })
+            
+            if (response.data.success) {
+                router.push('/dashboard')
+            } else {
+                setIsLoading(false)
+                setResultMsg(response.data.message)
+                setUsername('')
+                setPassword('')
+            }
+        } catch (err) {
+            console.log(err)
+            setIsLoading(false)
+            setResultMsg(err.response.data.message)
+            setUsername('')
+            setPassword('')
+        }
+    }
+
+    const checkLoginStatus = async () => {
+        try {
+            const response = await axiosInstance.get('/api/auth/check', {
+                withCredentials: true
+            })
+
+            if (response.data.ok) {
+                router.push('/dashboard')
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     
     
 
@@ -47,6 +93,12 @@ const UserLogin = () => {
         console.log(username, password)
         setIsLoading(true)
         try {
+            await userValidationScehma.validate({
+                userName: username
+            })
+            await userPasswordValidationSchema.validate({
+                userPassword: password
+            })
             const response = await axiosInstance.post('/api/account/create', {
                 username: username,
                 password: password
@@ -64,11 +116,17 @@ const UserLogin = () => {
             }
 
         } catch (err) {
-            console.log(err)
-            setResultMsg(err.response.data.message)
-            setIsLoading(false)
-            setUsername('')
-            setPassword('')
+            if (err instanceof yup.ValidationError) {
+                setResultMsg(err.errors)
+                setIsLoading(false)
+            } else {
+                console.log(err)
+                setResultMsg(err.response.data.message)
+                setIsLoading(false)
+                setUsername('')
+                setPassword('')
+            }
+            
         }
     }
 
@@ -114,7 +172,7 @@ const UserLogin = () => {
                     <button className="text-blue-500 p-1" onClick={handleCreateAcc}>Create a new account</button>
                 </div>
                 <div>
-                    <button className="text-blue-500 p-1" onClick={createUser}>Login</button>
+                    <button className="text-blue-500 p-1" onClick={loginUser}>Login</button>
                 </div>
             </div>}
         </form>
