@@ -9,7 +9,8 @@ const isAuthenticated = (req, res, next) => {
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET_KEY)
 
         req.user = decodedToken
-        debug('user is logged in', req.user)
+        debug('user is authenticated:', req.user)
+        next()
     } catch (err) {
         res.status(400).json({
             message: 'Invalid or expired token'
