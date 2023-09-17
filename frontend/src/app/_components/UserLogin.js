@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 
 import axiosInstance from '../../../axios'
 import Spinner from "./Loader"
@@ -8,7 +8,9 @@ import ResultModal from "./modals/resultModal"
 import { Josefin_Sans } from "next/font/google"
 import { userPasswordValidationSchema, userValidationScehma } from "../_schemas/authSchemas"
 import * as yup from 'yup'
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
+import checkLoginStatus from "../_modules/auth"
+import { userContext } from "../_context/authContext"
 
 const Josefin = Josefin_Sans({
     subsets: ['latin'],
@@ -28,6 +30,13 @@ const UserLogin = () => {
     const [resultMsg, setResultMsg] = useState('')
 
     const router = useRouter()
+    const pathname = usePathname()
+
+    const { user, setUser } = useContext(userContext)
+
+    useEffect(() => {
+        checkLoginStatus(pathname, router, setUser)
+    }, [])
 
     const handleCreateAcc = (e) => {
         e.preventDefault()
@@ -71,19 +80,7 @@ const UserLogin = () => {
         }
     }
 
-    const checkLoginStatus = async () => {
-        try {
-            const response = await axiosInstance.get('/api/auth/check', {
-                withCredentials: true
-            })
-
-            if (response.data.ok) {
-                router.push('/dashboard')
-            }
-        } catch (err) {
-            console.log(err)
-        }
-    }
+    
 
     
     

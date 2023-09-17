@@ -1,6 +1,7 @@
 
 import '../app/globals.css'
 import { Montserrat } from 'next/font/google'
+import { UserProvider } from './_context/authContext'
 
 const Monste = Montserrat({
   subsets: ['latin'],
@@ -18,7 +19,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${Monste.variable} font-sans`}>{children}</body>
+      <body className={`${Monste.variable} font-sans`}>
+        <UserProvider>{children}</UserProvider>
+        </body>
     </html>
   )
 }

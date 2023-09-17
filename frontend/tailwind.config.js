@@ -25,6 +25,10 @@ module.exports = {
       boxShadow: {
         'cont': 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;'
       },
+      colors: {
+        'dgray': '#444753',
+        'lgray': '#444753f0'
+      }
       
       
     },
