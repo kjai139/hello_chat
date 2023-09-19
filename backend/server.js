@@ -5,10 +5,15 @@ const cookieParser = require('cookie-parser')
 require('dotenv').config()
 const mongoose = require('mongoose')
 const apiRouter = require('./routes/api')
+const http = require('http')
+const { Server } = require('socket.io')
 
 const port = process.env.PORT || 4000
 const mongodb = process.env.MONGO_LOGIN
 const allowedOrigins = ['http://localhost:3000']
+const server = http.createServer(app)
+const io = new Server(server)
+
 
 const main = async () => {
     try {
@@ -31,6 +36,10 @@ app.use(express.urlencoded({extended: false}))
 
 app.use('/api', apiRouter)
 
-app.listen(port, () => {
+io.on('connection', (socket) => {
+    console.log('a user connected')
+})
+
+server.listen(port, () => {
     console.log(`server running on port 4000`)
 })

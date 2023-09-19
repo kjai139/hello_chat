@@ -8,6 +8,7 @@ import Contact from '../../../svgs/contacts.svg'
 import Settings from '../../../svgs/settings.svg'
 import Image from "next/image"
 import UserPortrait from '../../../svgs/userPortrait.svg?url'
+import ChatWindow from "../_components/ChatWindow"
 
 export default function Dashboard() {
 
@@ -39,8 +40,8 @@ export default function Dashboard() {
                     {user && 
                     <div className="flex items-center gap-4">
                     {user.image ?
-                    <Image src={user.image}></Image> :
-                    <Image src={UserPortrait} height="23" width="23"></Image>
+                    <Image src={user.image} height="23" width="23"></Image> :
+                    <Image src={UserPortrait} height="23" width="23" alt="default portrait"></Image>
                     }
                     <span>{user.username}</span>
                     </div>
@@ -52,7 +53,7 @@ export default function Dashboard() {
 
             </div>
             <div className="col-span-2">
-                column 3
+                <ChatWindow user={user}></ChatWindow>
 
             </div>
         </main>
