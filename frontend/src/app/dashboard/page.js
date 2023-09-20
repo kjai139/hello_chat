@@ -6,9 +6,11 @@ import { useRouter, usePathname } from "next/navigation"
 import { userContext } from "../_context/authContext"
 import Contact from '../../../svgs/contacts.svg'
 import Settings from '../../../svgs/settings.svg'
+import SignOff from '../../../svgs/sign-off.svg'
 import Image from "next/image"
-import UserPortrait from '../../../svgs/userPortrait.svg?url'
+import UserPortrait from '../../../svgs/userPortrait.svg'
 import ChatWindow from "../_components/ChatWindow"
+import DirectMessages from "../_components/DirectMessage"
 
 export default function Dashboard() {
 
@@ -31,8 +33,12 @@ export default function Dashboard() {
                             <h1>Contacts</h1>
                         </li>
                         <li className="flex gap-4">
-                            <Settings width="23" height="23" fill="white"></Settings>
+                            <Settings className="portrait-img" fill="white"></Settings>
                             <h1>Settings</h1>
+                        </li>
+                        <li className="flex gap-4">
+                            <SignOff className="portrait-img" fill="white"></SignOff>
+                            <h1>Sign out</h1>
                         </li>
                     </ul>
                 </div>
@@ -41,7 +47,7 @@ export default function Dashboard() {
                     <div className="flex items-center gap-4">
                     {user.image ?
                     <Image src={user.image} height="23" width="23"></Image> :
-                    <Image src={UserPortrait} height="23" width="23" alt="default portrait"></Image>
+                    <UserPortrait fill={user.defaultColor} className="portrait-img"></UserPortrait>
                     }
                     <span>{user.username}</span>
                     </div>
@@ -50,6 +56,7 @@ export default function Dashboard() {
             </div>
             <div className="bg-lgray text-white flex flex-col items-center">
                 <h1>DIRECT MESSAGES</h1>
+                <DirectMessages></DirectMessages>
 
             </div>
             <div className="col-span-2">
