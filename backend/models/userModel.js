@@ -53,7 +53,7 @@ const UserSchema = new Schema({
 
 })
 
-UserSchema.pre('save', (next) => {
+UserSchema.pre('save', function(next) {
     if (!this.defaultColor) {
         this.defaultColor = genRandomColor()
     }

@@ -27,12 +27,12 @@ const DirectMessages = ({selectUserConvo}) => {
 
     
     return (
-        <ul className='flex flex-col w-full'>
+        <ul className='flex flex-col w-full p-2'>
             {suggestedUsers && 
             suggestedUsers.map((node) => {
                 return (
-                    <li key={node._id} className='flex'>
-                        <div className='flex w-full justify-center'>
+                    <li key={node._id} className='flex p-2 hover:border-black rounded-lg border-4 border-transparent friendlist'>
+                        <div className='flex w-full justify-start items-center gap-2'>
                             {node.image ? 
                             <Image src={node.image} className='portrait-img'></Image> :
                             <UserPortrait className="portrait-img" fill={node.defaultColor}></UserPortrait>

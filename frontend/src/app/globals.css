@@ -6,6 +6,7 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --hoverC: #94a3b8;
   
 }
 
@@ -39,6 +40,16 @@
 .portrait-img {
   width: 23px;
   height: 23px;
+}
+
+.friendlist:hover {
+  background-color: var(--hoverC);
+  cursor: pointer;
+}
+
+.userUi:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 

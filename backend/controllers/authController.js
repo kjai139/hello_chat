@@ -13,3 +13,24 @@ exports.auth_check_get = async (req, res) => {
         })
     }
 }
+
+
+exports.auth_signout_delete = async (req, res) => {
+    try {
+        res.cookie('jwtToken', '', {
+            httpOnly: true,
+            maxAge: 0,
+            sameSite: 'None',
+            secure: true
+        })
+
+        res.json({
+            message: 'user has successfully signed out', 
+            ok: true
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: err
+        })
+    }
+}

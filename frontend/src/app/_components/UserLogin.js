@@ -36,6 +36,7 @@ const UserLogin = () => {
 
     useEffect(() => {
         checkLoginStatus(pathname, router, setUser)
+        console.log(user, 'checking user state')
     }, [])
 
     const handleCreateAcc = (e) => {
