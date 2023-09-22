@@ -27,7 +27,8 @@ module.exports = {
       },
       colors: {
         'dgray': '#444753',
-        'lgray': '#444753f0'
+        'lgray': '#444753f0',
+        'ltgray' : '#444753de'
       }
       
       

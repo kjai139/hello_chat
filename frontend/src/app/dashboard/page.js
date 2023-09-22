@@ -17,9 +17,11 @@ export default function Dashboard() {
 
     const router = useRouter()
     const pathname = usePathname()
-    const { user, setUser} = useContext(userContext)
+    const { user, setUser, selectedUser, setSelectedUser} = useContext(userContext)
 
     const [needRefresh, setNeedRefresh] = useState(false)
+
+    
 
     useEffect(() => {
         checkLoginStatus(pathname, router, setUser)
@@ -50,6 +52,11 @@ export default function Dashboard() {
         }
     }
 
+    const selectUser = (user) => {
+        setSelectedUser(user)
+        console.log(user, 'selected')
+    }
+
     return (
         <main className="mx-auto max-w-5xl grid grid-cols-4 h-screen">
             <div className="bg-dgray text-white p-6 flex flex-col">
@@ -76,18 +83,18 @@ export default function Dashboard() {
                     <Image src={user.image} height="23" width="23"></Image> :
                     <UserPortrait fill={user.defaultColor} className="portrait-img"></UserPortrait>
                     }
-                    <span>{user.username}</span>
+                    <span className="font-bold">{user.username}</span>
                     </div>
                     }
                 </div>
             </div>
             <div className="bg-lgray text-white flex flex-col items-center">
                 <h1>DIRECT MESSAGES</h1>
-                <DirectMessages></DirectMessages>
+                <DirectMessages onSelect={selectUser}></DirectMessages>
 
             </div>
-            <div className="col-span-2">
-                <ChatWindow user={user}></ChatWindow>
+            <div className="col-span-2 bg-ltgray">
+                <ChatWindow user={user} selectedUser={selectedUser}></ChatWindow>
 
             </div>
         </main>

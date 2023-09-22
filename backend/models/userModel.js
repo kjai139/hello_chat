@@ -13,7 +13,7 @@ const genRandomColor = () => {
     } else if (randomNumber === 3) {
         return '#f472b6'
     } else if (randomNumber === 4) {
-        return '#e11d48'
+        return '#d8b4fe'
     } else if (randomNumber === 5) {
         return '#4ade80'
     }

@@ -4,7 +4,7 @@ import Image from 'next/image'
 import UserPortrait from '../../../svgs/userPortrait.svg'
 
 
-const DirectMessages = ({selectUserConvo}) => {
+const DirectMessages = ({onSelect}) => {
 
     const [suggestedUsers, setSuggestedUsers] = useState()
 
@@ -31,7 +31,7 @@ const DirectMessages = ({selectUserConvo}) => {
             {suggestedUsers && 
             suggestedUsers.map((node) => {
                 return (
-                    <li key={node._id} className='flex p-2 hover:border-black rounded-lg border-4 border-transparent friendlist'>
+                    <li key={node._id} className='flex p-2 hover:border-black rounded-lg border-4 border-transparent friendlist' onClick={() => onSelect(node)}>
                         <div className='flex w-full justify-start items-center gap-2'>
                             {node.image ? 
                             <Image src={node.image} className='portrait-img'></Image> :
