@@ -1,6 +1,6 @@
 'use client'
 
-import { useContext, useEffect, useState } from "react"
+import { Suspense, useContext, useEffect, useState } from "react"
 import checkLoginStatus from "../_modules/auth"
 import { useRouter, usePathname } from "next/navigation"
 import { userContext } from "../_context/authContext"
@@ -12,6 +12,7 @@ import UserPortrait from '../../../svgs/userPortrait.svg'
 import ChatWindow from "../_components/ChatWindow"
 import DirectMessages from "../_components/DirectMessage"
 import axiosInstance from '../../../axios'
+
 
 export default function Dashboard() {
 
@@ -43,7 +44,7 @@ export default function Dashboard() {
 
             if (response.data.ok) {
                 setUser()
-                setNeedRefresh(true)
+                router.push('/')
             }
 
 
@@ -59,6 +60,7 @@ export default function Dashboard() {
 
     return (
         <main className="mx-auto max-w-5xl grid grid-cols-4 h-screen">
+            
             <div className="bg-dgray text-white p-6 flex flex-col">
                 <div className="flex justify-center">
                     <ul className="flex flex-col gap-4">
@@ -90,13 +92,16 @@ export default function Dashboard() {
             </div>
             <div className="bg-lgray text-white flex flex-col items-center">
                 <h1>DIRECT MESSAGES</h1>
+                
                 <DirectMessages onSelect={selectUser}></DirectMessages>
+                
 
             </div>
-            <div className="col-span-2 bg-ltgray">
+            <div className="col-span-2 bg-ltgray flex flex-col">
                 <ChatWindow user={user} selectedUser={selectedUser}></ChatWindow>
 
             </div>
+            
         </main>
     )
 }
