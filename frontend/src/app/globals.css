@@ -42,8 +42,7 @@
 }
 
 .portrait-img {
-  width: 23px;
-  height: 23px;
+  max-height: 30px;
 }
 
 .friendlist:hover {

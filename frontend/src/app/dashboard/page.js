@@ -14,6 +14,7 @@ import DirectMessages from "../_components/DirectMessage"
 import axiosInstance from '../../../axios'
 
 
+
 export default function Dashboard() {
 
     const router = useRouter()
@@ -62,7 +63,7 @@ export default function Dashboard() {
         <main className="mx-auto max-w-5xl grid grid-cols-4 h-screen">
             
             <div className="bg-dgray text-white p-6 flex flex-col">
-                <div className="flex justify-center">
+                <div className="flex justify-center w-full">
                     <ul className="flex flex-col gap-4">
                         <li className="flex gap-4 userUi">
                             <Contact width="23" height="23" fill="white"></Contact>
@@ -74,13 +75,13 @@ export default function Dashboard() {
                         </li>
                         <li className="flex gap-4 userUi" onClick={signOut}>
                             <SignOff className="portrait-img" fill="white"></SignOff>
-                            <h1>Sign out</h1>
+                            <h1 className="w-full">Sign out</h1>
                         </li>
                     </ul>
                 </div>
                 <div className="mt-auto justify-center flex">
                     {user && 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 w-full justify-center">
                     {user.image ?
                     <Image src={user.image} height="23" width="23"></Image> :
                     <UserPortrait fill={user.defaultColor} className="portrait-img"></UserPortrait>
@@ -91,7 +92,7 @@ export default function Dashboard() {
                 </div>
             </div>
             <div className="bg-lgray text-white flex flex-col items-center">
-                <h1>DIRECT MESSAGES</h1>
+                <span className={`text-sm w-full p-4 `}>DIRECT MESSAGES</span>
                 
                 <DirectMessages onSelect={selectUser}></DirectMessages>
                 

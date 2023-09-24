@@ -156,7 +156,7 @@ const UserLogin = () => {
            {isUserCreatingAcc ? 
            <div className="flex justify-between">
            <div>
-               <button className="text-blue-500 p-1 animate-fade-in" onClick={handleBacktoLogin}>{'<- Back to Login'}</button>
+               <button type="button" className="text-blue-500 p-1 animate-fade-in" onClick={handleBacktoLogin}>{'<- Back to Login'}</button>
            </div>       
            
            <div>
@@ -167,7 +167,7 @@ const UserLogin = () => {
            <div className="flex justify-between">
                   
                 <div>
-                    <button className="text-blue-500 p-1" onClick={handleCreateAcc}>Create a new account</button>
+                    <button type="button" className="text-blue-500 p-1" onClick={handleCreateAcc}>Create a new account</button>
                 </div>
                 <div>
                     <button className="text-blue-500 p-1" onClick={loginUser}>Login</button>
