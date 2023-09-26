@@ -12,7 +12,8 @@ const port = process.env.PORT || 4000
 const mongodb = process.env.MONGO_LOGIN
 const allowedOrigins = ['http://localhost:3000']
 const server = http.createServer(app)
-const io = new Server(server)
+const SocketIoConfig = require('./socket')
+
 
 
 const main = async () => {
@@ -26,6 +27,8 @@ const main = async () => {
 
 main()
 
+SocketIoConfig(server)
+
 app.use(cors({
     origin:allowedOrigins,
     credentials: true
@@ -36,9 +39,7 @@ app.use(express.urlencoded({extended: false}))
 
 app.use('/api', apiRouter)
 
-io.on('connection', (socket) => {
-    console.log('a user connected')
-})
+
 
 server.listen(port, () => {
     console.log(`server running on port 4000`)

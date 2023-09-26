@@ -1,14 +1,53 @@
 import Image from "next/image"
 import UserPortrait from '../../../svgs/userPortrait.svg'
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import axiosInstance from '../../../axios'
+import socket from "../../../socket"
+
 
 const ChatWindow = ({selectedUser, userId, msgs, user}) => {
 
     const [message, setMessage] = useState('')
+    const [chatlog, setChatLog] = useState()
 
-    const sendMessage = (e) => {
+    useEffect(() => {
+        if (!socket.connected) {
+            socket.connect()
+        }
+
+        socket.on('connect', () => {
+            console.log('client connected:', socket.id)
+        })
+        socket.on('message', (data) => {
+            console.log('received msg from ws:', data)
+        })
+        //have to make sure remove the listeners
+        return () => {
+            socket.off('message')
+            socket.off('connect')
+            socket.disconnect()
+        }
+    }, [])
+
+    const sendMessage = async (e) => {
         e.preventDefault()
-        console.log('message:', message)
+        
+        try {
+            const response = await axiosInstance.post('/api/messages/send', {
+                message: message,
+                users: [user._id, selectedUser._id],
+                sender: user._id
+            }, {
+                withCredentials: true
+            })
+            console.log('message:', message)
+            console.log('users:', user, selectedUser)
+            if (response.data.success) {
+                setMessage('')
+            }
+        } catch (err) {
+            console.log(err)
+        }
     }
 
     const handleKeyPress = (e) => {

@@ -1,4 +1,4 @@
-import io from 'socket.io-client'
+import { io } from "socket.io-client"
 
 let url
 
@@ -8,6 +8,8 @@ if (process.env.NODE_ENV === 'production') {
     url = 'http://localhost:4000'
 }
 
-const socket = io(url)
+const socket = io(url, {
+    withCredentials: true
+})
 
 export default socket

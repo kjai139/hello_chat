@@ -1,4 +1,4 @@
-import { Roboto_Mono, Montserrat } from "next/font/google"
+import { Roboto_Mono, Montserrat, Josefin_Sans } from "next/font/google"
 
 
 export const Robo = Roboto_Mono({
@@ -15,4 +15,9 @@ export const Monste = Montserrat({
     variable: '--font-inter'
 })
 
+export const Josefin = Josefin_Sans({
+    subsets: ['latin'],
+    variable: '--font-josefin',
+    preload: true
+})
 

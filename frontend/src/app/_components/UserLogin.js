@@ -5,18 +5,14 @@ import { useContext, useEffect, useState } from "react"
 import axiosInstance from '../../../axios'
 import Spinner from "./Loader"
 import ResultModal from "./modals/resultModal"
-import { Josefin_Sans } from "next/font/google"
+import { Josefin } from "../fonts"
 import { userPasswordValidationSchema, userValidationScehma } from "../_schemas/authSchemas"
 import * as yup from 'yup'
 import { useRouter, usePathname } from "next/navigation"
 import checkLoginStatus from "../_modules/auth"
 import { userContext } from "../_context/authContext"
 
-const Josefin = Josefin_Sans({
-    subsets: ['latin'],
-    variable: '--font-josefin',
-    preload: true
-})
+
 
 
 
@@ -141,9 +137,9 @@ const UserLogin = () => {
         <h1 className="font-bold md:text-2xl lg:text-3xl">Hello Chat Messenger</h1>
         <form className="flex flex-col gap-2">
             {isUserCreatingAcc ? 
-            <h1 className={`${Josefin.variable} font-josefin animate-fade-in`}>Creating account</h1>
+            <h1 className={`${Josefin.className} animate-fade-in`}>Creating account</h1>
             :
-            <h1 className={`${Josefin.variable} font-josefin`}>Log In</h1>
+            <h1 className={`${Josefin.className}`}>Log In</h1>
             }
             <div className="input-cont">
             <label htmlFor="username">Username</label>

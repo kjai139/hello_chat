@@ -11,6 +11,7 @@
   "dependencies": {
     "autoprefixer": "10.4.15",
     "axios": "^1.5.0",
+    "bufferutil": "^4.0.7",
     "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
     "next": "13.4.19",
@@ -18,8 +19,10 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-loader-spinner": "^5.4.5",
-    "socket.io": "^4.7.2",
+    "socket.io-client": "^4.7.2",
     "tailwindcss": "3.3.3",
+    "utf-8-validate": "^5.0.10",
+    "ws": "^8.14.2",
     "yup": "^1.2.0"
   },
   "devDependencies": {
