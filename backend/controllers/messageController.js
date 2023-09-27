@@ -18,8 +18,30 @@ exports.messages_post = async (req, res) => {
 
         if (existingConvo.length > 0) {
             debug('a convo already exist:', existingConvo)
+            const newMsg = new Message({
+                convo: existingConvo[0]._id,
+                sender: req.body.sender,
+                content: messageContent
+            })
+            
+            await newMsg.save()
         } else {
             debug('convo doesnt exist between users yet')
+            const newConvo = new Convo({
+                participants: req.body.users
+            })
+
+            const savedConvo = await newConvo.save()
+            debug('saved convo id', savedConvo._id)
+
+            const newMsg = new Message({
+                convo:savedConvo._id,
+                sender: req.body.sender,
+                content: messageContent
+            })
+
+            await newMsg.save()
+
         }
 
         SocketIoConfig.io.emit('message', messageContent)

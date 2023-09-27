@@ -22,6 +22,7 @@ export default function Dashboard() {
     const { user, setUser, selectedUser, setSelectedUser} = useContext(userContext)
 
     const [needRefresh, setNeedRefresh] = useState(false)
+    const [messageArr, setmessageArr] = useState([])
 
     
 
@@ -54,9 +55,27 @@ export default function Dashboard() {
         }
     }
 
-    const selectUser = (user) => {
+    const selectUser = async (user) => {
         setSelectedUser(user)
         console.log(user, 'selected')
+        try {
+            const response = await axiosInstance.post('api/convo/get', {
+                selectedUser: user._id
+            }, {
+                withCredentials: true
+            })
+
+            console.log(response.data.message)
+            if (response.data.success) {
+                console.log(response.data.messageArr)
+                setmessageArr(response.data.messageArr)
+            }
+        } catch (err) {
+            console.log(err)
+            if (err.response.data.reroute) {
+                router.push('/')
+            }
+        }
     }
 
     return (
@@ -99,7 +118,7 @@ export default function Dashboard() {
 
             </div>
             <div className="col-span-2 bg-ltgray flex flex-col">
-                <ChatWindow user={user} selectedUser={selectedUser}></ChatWindow>
+                <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr}></ChatWindow>
 
             </div>
             

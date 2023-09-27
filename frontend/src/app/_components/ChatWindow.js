@@ -67,13 +67,25 @@ const ChatWindow = ({selectedUser, userId, msgs, user}) => {
                 <span className="text-white font-bold">{selectedUser && selectedUser.username}</span>
             
             </div>
+            <div>
             {msgs && msgs.map((node, idx) => {
+                console.log(node, 'node')
                 return (
-                    <div className={node.sender === user._id ? 'userMsg-div' : 'incMsg-div'} key={node._id}>
+                    <div className='flex' key={node._id}>
                         
+                        {node.image ? 
+                            <Image src={node.image} className='portrait-img'></Image> :
+                            <UserPortrait className="portrait-img" fill={node.defaultColor}></UserPortrait>
+                            }
+                        
+                        <div className="flex flex-col">
+                            <span>{node.sender.username}</span>
+                            <span>{node.content}</span>
+                        </div>
                     </div>    
                 )
             })}
+            </div>
             {
                 selectedUser &&
                 <form onSubmit={sendMessage} className="p-4 flex items-end flex-1">
