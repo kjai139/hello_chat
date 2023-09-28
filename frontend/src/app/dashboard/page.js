@@ -29,6 +29,7 @@ export default function Dashboard() {
     useEffect(() => {
         checkLoginStatus(pathname, router, setUser)
         
+        
     }, [])
 
     useEffect(() => {
@@ -57,6 +58,7 @@ export default function Dashboard() {
 
     const selectUser = async (user) => {
         setSelectedUser(user)
+        setmessageArr()
         console.log(user, 'selected')
         try {
             const response = await axiosInstance.post('api/convo/get', {
@@ -118,7 +120,7 @@ export default function Dashboard() {
 
             </div>
             <div className="col-span-2 bg-ltgray flex flex-col">
-                <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr}></ChatWindow>
+                <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr} setMsgs={setmessageArr}></ChatWindow>
 
             </div>
             

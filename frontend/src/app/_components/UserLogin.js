@@ -28,9 +28,10 @@ const UserLogin = () => {
     const router = useRouter()
     const pathname = usePathname()
 
-    const { user, setUser } = useContext(userContext)
+    const { user, setUser, setSelectedUser } = useContext(userContext)
 
     useEffect(() => {
+        setSelectedUser(null)
         checkLoginStatus(pathname, router, setUser)
         console.log(user, 'checking user state')
     }, [])

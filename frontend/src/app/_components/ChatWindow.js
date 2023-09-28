@@ -3,14 +3,16 @@ import UserPortrait from '../../../svgs/userPortrait.svg'
 import { useEffect, useState } from "react"
 import axiosInstance from '../../../axios'
 import socket from "../../../socket"
+import { format, isToday, isYesterday, parseISO } from "date-fns"
 
 
-const ChatWindow = ({selectedUser, userId, msgs, user}) => {
+const ChatWindow = ({selectedUser, userId, msgs, user, setMsgs}) => {
 
     const [message, setMessage] = useState('')
     const [chatlog, setChatLog] = useState()
 
     useEffect(() => {
+        console.log(selectedUser, 'selected user on mount')
         if (!socket.connected) {
             socket.connect()
         }
@@ -20,6 +22,7 @@ const ChatWindow = ({selectedUser, userId, msgs, user}) => {
         })
         socket.on('message', (data) => {
             console.log('received msg from ws:', data)
+            setMsgs(prev => [...prev, data])
         })
         //have to make sure remove the listeners
         return () => {
@@ -67,24 +70,42 @@ const ChatWindow = ({selectedUser, userId, msgs, user}) => {
                 <span className="text-white font-bold">{selectedUser && selectedUser.username}</span>
             
             </div>
-            <div>
-            {msgs && msgs.map((node, idx) => {
+            <div className="text-white p-4 flex flex-col gap-4">
+            {msgs ? msgs.map((node, idx) => {
                 console.log(node, 'node')
+
+                let parsedDate = parseISO(node.timestamp)
+
+                let formattedTimestamp
+                if (isToday(parsedDate)) {
+                    formattedTimestamp = format(parsedDate, "'Today at' hh:mm aa")
+                } else if (isYesterday(parsedDate)) {
+                    formattedTimestamp = format(parsedDate, "'Yesterday at' hh:mm aa")
+                } else {
+                    formattedTimestamp = format(parsedDate, "MM/dd/yyyy 'at' hh:mm aa")
+                }
+
+
                 return (
-                    <div className='flex' key={node._id}>
+                    <div className='flex gap-2' key={node._id}>
                         
                         {node.image ? 
                             <Image src={node.image} className='portrait-img'></Image> :
-                            <UserPortrait className="portrait-img" fill={node.defaultColor}></UserPortrait>
+                            <UserPortrait className="portrait-img" fill={node.sender.defaultColor}></UserPortrait>
                             }
                         
                         <div className="flex flex-col">
-                            <span>{node.sender.username}</span>
+                            <div className="flex gap-2 justify-center items-center">
+                            <span className="font-bold">{node.sender.username}</span>
+                            <span className="text-xs">{formattedTimestamp}</span>
+                            </div>
                             <span>{node.content}</span>
                         </div>
                     </div>    
                 )
-            })}
+            }): <div>
+                    <h1>Say hi to {selectedUser.username}~</h1>
+                </div>}
             </div>
             {
                 selectedUser &&

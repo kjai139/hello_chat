@@ -25,6 +25,11 @@ exports.messages_post = async (req, res) => {
             })
             
             await newMsg.save()
+            const getNewMsg = await Message.findById(newMsg._id).populate('sender')
+            SocketIoConfig.io.emit('message', getNewMsg)
+            res.status(200).json({
+                success: true
+            })
         } else {
             debug('convo doesnt exist between users yet')
             const newConvo = new Convo({
@@ -42,12 +47,15 @@ exports.messages_post = async (req, res) => {
 
             await newMsg.save()
 
+            const getNewMsg = await Message.findById(newMsg._id).populate('sender')
+            SocketIoConfig.io.emit('message', getNewMsg)
+            res.status(200).json({
+                success: true
+            })
+
         }
 
-        SocketIoConfig.io.emit('message', messageContent)
-        res.status(200).json({
-            success: true
-        })
+        
 
     } catch (err) {
         debug(err)
