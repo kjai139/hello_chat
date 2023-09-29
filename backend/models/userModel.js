@@ -48,6 +48,11 @@ const UserSchema = new Schema({
     defaultColor: {
         type:String,
         
+    },
+    status: {
+        type:String,
+        enum:['online', 'offline', 'busy', 'away'],
+        default:'offline'
     }
 
 

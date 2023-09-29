@@ -1,15 +1,16 @@
 import Image from "next/image"
 import UserPortrait from '../../../svgs/userPortrait.svg'
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import axiosInstance from '../../../axios'
 import socket from "../../../socket"
-import { format, isToday, isYesterday, parseISO } from "date-fns"
+import { addMinutes, format, isToday, isWithinInterval, isYesterday, parseISO } from "date-fns"
 
 
-const ChatWindow = ({selectedUser, userId, msgs, user, setMsgs}) => {
+const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
 
     const [message, setMessage] = useState('')
     const [chatlog, setChatLog] = useState()
+    const chatRef = useRef(null)
 
     useEffect(() => {
         console.log(selectedUser, 'selected user on mount')
@@ -32,25 +33,74 @@ const ChatWindow = ({selectedUser, userId, msgs, user, setMsgs}) => {
         }
     }, [])
 
+    useEffect(() => {
+        
+        requestAnimationFrame(scrollToBottom)
+    }, [msgs])
+
+    const scrollToBottom = () => {
+        console.log('chatref', chatRef.current)
+        if (selectedUser && chatRef.current) {
+            chatRef.current.scrollTop = chatRef.current.scrollHeight
+        }
+    }
+
     const sendMessage = async (e) => {
         e.preventDefault()
+
         
-        try {
-            const response = await axiosInstance.post('/api/messages/send', {
-                message: message,
-                users: [user._id, selectedUser._id],
-                sender: user._id
-            }, {
-                withCredentials: true
-            })
-            console.log('message:', message)
-            console.log('users:', user, selectedUser)
-            if (response.data.success) {
-                setMessage('')
+
+        if (msgs.length > 0) {
+            const dateNow = new Date()
+            const lastMsg = msgs[msgs.length -1 ]
+            const lastMsgId = lastMsg._id
+            const parsedTime = parseISO(lastMsg.timestamp)
+            const endTime = addMinutes(parsedTime, 1)
+
+            console.log('lastmsg Id:', lastMsgId)
+
+            if (isWithinInterval(dateNow, {
+                start: parsedTime,
+                end: endTime
+            })) {
+                console.log(`${dateNow} is within 1 minute of ${parsedTime} and ${endTime}`)
+                //within 1 min, add msg to last
+                try {
+                    const response = await axiosInstance.post('/api/messages/edit', {
+                        message: message,
+                        messageId: lastMsgId
+                    }, {
+                        withCredentials: true
+                    })
+
+                    
+
+                } catch (err) {
+                    console.log(err)
+                }
+            } else {
+                console.log(`${dateNow} is not within 1 minute of ${parsedTime} and ${endTime}`)
+                try {
+                    const response = await axiosInstance.post('/api/messages/send', {
+                        message: message,
+                        users: [user._id, selectedUser._id],
+                        sender: user._id
+                    }, {
+                        withCredentials: true
+                    })
+                    console.log('message:', message)
+                    console.log('users:', user, selectedUser)
+                    if (response.data.success) {
+                        setMessage('')
+                    }
+                } catch (err) {
+                    console.log(err)
+                }
             }
-        } catch (err) {
-            console.log(err)
+
         }
+        
+
     }
 
     const handleKeyPress = (e) => {
@@ -61,7 +111,7 @@ const ChatWindow = ({selectedUser, userId, msgs, user, setMsgs}) => {
         }
     }
     return (
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 max-h-screen">
             <div className="flex p-4 gap-2 border-b-2 selected-top">
             {selectedUser && selectedUser.image ? 
                 <Image src={selectedUser.image} className='portrait-img'></Image> : selectedUser &&
@@ -70,7 +120,7 @@ const ChatWindow = ({selectedUser, userId, msgs, user, setMsgs}) => {
                 <span className="text-white font-bold">{selectedUser && selectedUser.username}</span>
             
             </div>
-            <div className="text-white p-4 flex flex-col gap-4">
+            <div className="text-white p-4 flex flex-col gap-4 overflow-y-auto" ref={chatRef}>
             {msgs ? msgs.map((node, idx) => {
                 console.log(node, 'node')
 
@@ -95,7 +145,7 @@ const ChatWindow = ({selectedUser, userId, msgs, user, setMsgs}) => {
                             }
                         
                         <div className="flex flex-col">
-                            <div className="flex gap-2 justify-center items-center">
+                            <div className="flex gap-2 items-center">
                             <span className="font-bold">{node.sender.username}</span>
                             <span className="text-xs">{formattedTimestamp}</span>
                             </div>

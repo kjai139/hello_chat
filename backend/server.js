@@ -10,7 +10,7 @@ const { Server } = require('socket.io')
 
 const port = process.env.PORT || 4000
 const mongodb = process.env.MONGO_LOGIN
-const allowedOrigins = ['http://localhost:3000']
+const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001']
 const server = http.createServer(app)
 const SocketIoConfig = require('./socket')
 

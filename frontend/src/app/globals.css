@@ -59,6 +59,22 @@
   border-color: var(--selectedBg);
 }
 
+/* Style the scrollbar track */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+/* Style the scrollbar thumb (the draggable part) */
+::-webkit-scrollbar-thumb {
+  background-color: var(--selectedBg); 
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  
+  
+}
+
 
 
 @keyframes fadeIn {
