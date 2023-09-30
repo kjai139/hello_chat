@@ -3,6 +3,27 @@ const debug = require('debug')('hello_chat:messageController')
 const Message = require('../models/messageModel')
 const Convo = require('../models/convoModel')
 
+
+exports.message_edit = async (req, res) => {
+    try {
+        const prevMsg = await Message.findById(req.body.messageId)
+
+        prevMsg.content = prevMsg.content + '\n' + req.body.message
+
+        await prevMsg.save()
+        debug('new msg:', prevMsg.content)
+        const newPrevMsg = await Message.findById(req.body.messageId)
+        SocketIoConfig.io.emit('sameUserMsg', newPrevMsg)
+        res.json({
+            success:true
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
 exports.messages_post = async (req, res) => {
     try {
         debug('msg:', req.body.message)

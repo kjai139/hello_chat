@@ -1,21 +1,25 @@
 import Image from "next/image"
 import UserPortrait from '../../../svgs/userPortrait.svg'
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import axiosInstance from '../../../axios'
 import socket from "../../../socket"
 import { addMinutes, format, isToday, isWithinInterval, isYesterday, parseISO } from "date-fns"
+import { userContext } from "../_context/authContext"
 
 
 const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
 
+    
     const [message, setMessage] = useState('')
     const [chatlog, setChatLog] = useState()
+    const [isSocketConnected, setIsSocketConnected] = useState(false)
     const chatRef = useRef(null)
 
     useEffect(() => {
         console.log(selectedUser, 'selected user on mount')
         if (!socket.connected) {
             socket.connect()
+            
         }
 
         socket.on('connect', () => {
@@ -25,10 +29,14 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
             console.log('received msg from ws:', data)
             setMsgs(prev => [...prev, data])
         })
+        socket.on('sameUserMsg', (data) => {
+            console.log('received sameuserMsg from ws', data.content)
+        })
         //have to make sure remove the listeners
         return () => {
             socket.off('message')
             socket.off('connect')
+            setIsSocketConnected(false)
             socket.disconnect()
         }
     }, [])
@@ -37,6 +45,14 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
         
         requestAnimationFrame(scrollToBottom)
     }, [msgs])
+
+    useEffect(() => {
+        if (user && socket.connected) {
+            socket.emit('joinRoom', user._id)
+        }
+    }, [user])
+
+    
 
     const scrollToBottom = () => {
         console.log('chatref', chatRef.current)
@@ -57,9 +73,9 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
             const parsedTime = parseISO(lastMsg.timestamp)
             const endTime = addMinutes(parsedTime, 1)
 
-            console.log('lastmsg Id:', lastMsgId)
+            console.log('lastmsg Id:', lastMsg.sender._id, user._id)
 
-            if (isWithinInterval(dateNow, {
+            if (user._id === lastMsg.sender._id && isWithinInterval(dateNow, {
                 start: parsedTime,
                 end: endTime
             })) {
@@ -149,7 +165,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
                             <span className="font-bold">{node.sender.username}</span>
                             <span className="text-xs">{formattedTimestamp}</span>
                             </div>
-                            <span>{node.content}</span>
+                            <span className="whitespace-pre-wrap">{node.content}</span>
                         </div>
                     </div>    
                 )

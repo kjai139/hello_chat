@@ -19,11 +19,23 @@ module.exports = (server) => {
         }
     })
 
+    const users = {}
+
     io.on('connection', (socket) => {
         console.log('A user has connected.')
 
+        socket.on('joinRoom', (userId) => {
+            socket.join(userId)
+            console.log(`User ${userId} has joinned room ${userId}`)
+        })
+
+        socket.on('disconnecting', () => {
+            console.log('socket rooms', socket.rooms)
+        })
+
         socket.on('disconnect', () => {
             console.log('User disconnected')
+            console.log('socket rooms size: ', socket.rooms.size)
         })
     })
 
