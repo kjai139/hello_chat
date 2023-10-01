@@ -8,6 +8,8 @@
   --background-end-rgb: 255, 255, 255;
   --hoverC: #94a3b8;
   --selectedBg: #444753de;
+  --onlineC:#16a34a;
+  --offlineC:#475569;
   
 }
 
@@ -73,6 +75,21 @@
 ::-webkit-scrollbar-thumb:hover {
   
   
+}
+
+.status-indi {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--onlineC);
+  bottom: 0;
+  right: 0px;
+}
+
+.status-indi.offline {
+  background-color: #94a3b8;
+  border: 2px solid var(--offlineC);
 }
 
 

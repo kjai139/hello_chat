@@ -19,6 +19,8 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
         console.log(selectedUser, 'selected user on mount')
         if (!socket.connected) {
             socket.connect()
+            socket.emit('joinRoom', user._id)
+            
             
         }
 
@@ -31,6 +33,12 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
         })
         socket.on('sameUserMsg', (data) => {
             console.log('received sameuserMsg from ws', data.content)
+            setMsgs((prev) => {
+                const updatedMsgs = [...prev]
+                updatedMsgs[updatedMsgs.length - 1].content = data.content
+
+                return updatedMsgs
+            })
         })
         //have to make sure remove the listeners
         return () => {
@@ -46,12 +54,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
         requestAnimationFrame(scrollToBottom)
     }, [msgs])
 
-    useEffect(() => {
-        if (user && socket.connected) {
-            socket.emit('joinRoom', user._id)
-        }
-    }, [user])
-
+    
     
 
     const scrollToBottom = () => {
@@ -84,15 +87,21 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
                 try {
                     const response = await axiosInstance.post('/api/messages/edit', {
                         message: message,
-                        messageId: lastMsgId
+                        messageId: lastMsgId,
+                        recipientId: selectedUser._id
                     }, {
                         withCredentials: true
                     })
+
+                    if (response.data.success) {
+                        setMessage('')
+                    }
 
                     
 
                 } catch (err) {
                     console.log(err)
+                    
                 }
             } else {
                 console.log(`${dateNow} is not within 1 minute of ${parsedTime} and ${endTime}`)
@@ -100,7 +109,8 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
                     const response = await axiosInstance.post('/api/messages/send', {
                         message: message,
                         users: [user._id, selectedUser._id],
-                        sender: user._id
+                        sender: user._id,
+                        recipientId: selectedUser._id
                     }, {
                         withCredentials: true
                     })

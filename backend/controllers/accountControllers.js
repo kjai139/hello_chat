@@ -91,7 +91,8 @@ exports.account_login_post = async (req, res) => {
                 normalized_name: user.normalized_name,
                 friends: user.friends,
                 email: user.email,
-                defaultColor: user.defaultColor
+                defaultColor: user.defaultColor,
+                status: user.status
             }, process.env.JWT_SECRET_KEY, {
                 expiresIn: '1hr'
             })

@@ -102,11 +102,21 @@ export default function Dashboard() {
                 </div>
                 <div className="mt-auto justify-center flex">
                     {user && 
-                    <div className="flex items-center gap-4 w-full justify-center">
+                    <div className="flex items-center gap-2 w-full justify-center">
+                    <div className="w-8 relative">
                     {user.image ?
-                    <Image src={user.image} height="23" width="23"></Image> :
+                    
+                    <Image src={user.image}></Image>
+                    
+                    
+                     :
                     <UserPortrait fill={user.defaultColor} className="portrait-img"></UserPortrait>
                     }
+                    <span className="status-indi"></span>
+                    </div>
+
+                   
+                   
                     <span className="font-bold">{user.username}</span>
                     </div>
                     }
@@ -120,7 +130,7 @@ export default function Dashboard() {
 
             </div>
             <div className="col-span-2 bg-ltgray flex flex-col">
-                <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr} setMsgs={setmessageArr}></ChatWindow>
+                {user && <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr} setMsgs={setmessageArr}></ChatWindow>}
 
             </div>
             

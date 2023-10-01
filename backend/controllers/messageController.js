@@ -13,7 +13,8 @@ exports.message_edit = async (req, res) => {
         await prevMsg.save()
         debug('new msg:', prevMsg.content)
         const newPrevMsg = await Message.findById(req.body.messageId)
-        SocketIoConfig.io.emit('sameUserMsg', newPrevMsg)
+        SocketIoConfig.io.to(req.user._id).to(req.body.recipientId).emit('sameUserMsg', newPrevMsg)
+
         res.json({
             success:true
         })
@@ -47,7 +48,7 @@ exports.messages_post = async (req, res) => {
             
             await newMsg.save()
             const getNewMsg = await Message.findById(newMsg._id).populate('sender')
-            SocketIoConfig.io.emit('message', getNewMsg)
+            SocketIoConfig.io.to(req.user._id).to(req.body.recipientId).emit('message', getNewMsg)
             res.status(200).json({
                 success: true
             })
@@ -69,7 +70,7 @@ exports.messages_post = async (req, res) => {
             await newMsg.save()
 
             const getNewMsg = await Message.findById(newMsg._id).populate('sender')
-            SocketIoConfig.io.emit('message', getNewMsg)
+            SocketIoConfig.io.to(req.user._id).to(req.body.recipientId).emit('message', getNewMsg)
             res.status(200).json({
                 success: true
             })
