@@ -30,4 +30,15 @@ const checkLoginStatus = async (pathname, router, setUser) => {
     }
 }
 
-export default checkLoginStatus
+const signOffUser = async (user) => {
+    try {
+        const response = await axiosInstance.post('/api/user/status/update', {
+            userId: user._id,
+            newStatus: 'offline'
+        })
+    } catch (err) {
+        console.log(err)
+    }
+}
+
+export {checkLoginStatus, signOffUser}

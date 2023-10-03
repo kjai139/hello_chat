@@ -1,4 +1,5 @@
 const debug = require('debug')('hello_chat:authController')
+const User = require('../models/userModel')
 
 exports.auth_check_get = async (req, res) => {
     debug('req user from auth check', req.user)
@@ -17,6 +18,11 @@ exports.auth_check_get = async (req, res) => {
 
 exports.auth_signout_delete = async (req, res) => {
     try {
+        debug('req.user from signout ', req.user)
+        const user = await User.findByIdAndUpdate(req.user._id, {status: 'offline'})
+        
+
+
         res.cookie('jwtToken', '', {
             httpOnly: true,
             maxAge: 0,

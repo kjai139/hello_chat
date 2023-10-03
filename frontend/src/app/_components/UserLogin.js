@@ -9,7 +9,7 @@ import { Josefin } from "../fonts"
 import { userPasswordValidationSchema, userValidationScehma } from "../_schemas/authSchemas"
 import * as yup from 'yup'
 import { useRouter, usePathname } from "next/navigation"
-import checkLoginStatus from "../_modules/auth"
+import {checkLoginStatus} from "../_modules/auth"
 import { userContext } from "../_context/authContext"
 
 

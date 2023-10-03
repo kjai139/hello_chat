@@ -19,7 +19,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
         console.log(selectedUser, 'selected user on mount')
         if (!socket.connected) {
             socket.connect()
-            socket.emit('joinRoom', user._id)
+            
             
             
         }
@@ -40,11 +40,13 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
                 return updatedMsgs
             })
         })
+        socket.on("disconnect", (reason) => {
+            console.log('dc reason', reason)
+        })
         //have to make sure remove the listeners
         return () => {
-            socket.off('message')
-            socket.off('connect')
-            setIsSocketConnected(false)
+            socket.removeAllListeners()
+            
             socket.disconnect()
         }
     }, [])
@@ -53,6 +55,15 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
         
         requestAnimationFrame(scrollToBottom)
     }, [msgs])
+
+    useEffect(() => {
+        if (user) {
+            socket.emit('joinRoom', user._id)
+            
+        }
+    }, [user])
+
+    
 
     
     

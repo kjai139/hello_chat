@@ -85,6 +85,10 @@ exports.account_login_post = async (req, res) => {
             const passwordsMatch = await bcrypt.compare(password, user.password)
 
             if (passwordsMatch) {
+                if (user.status === 'offline') {
+                    user.status = 'online'
+                    await user.save()
+                }
             const token = jwt.sign({
                 _id: user._id,
                 username: user.username,

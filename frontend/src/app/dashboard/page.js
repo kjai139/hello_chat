@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense, useContext, useEffect, useState } from "react"
-import checkLoginStatus from "../_modules/auth"
+import {checkLoginStatus, signOffUser} from "../_modules/auth"
 import { useRouter, usePathname } from "next/navigation"
 import { userContext } from "../_context/authContext"
 import Contact from '../../../svgs/contacts.svg'
@@ -40,6 +40,7 @@ export default function Dashboard() {
     }, [needRefresh])
 
     const signOut = async () => {
+        const userId = user._id
         try {
             const response = await axiosInstance.delete('api/auth/signout', {
                 withCredentials: true
@@ -53,6 +54,11 @@ export default function Dashboard() {
 
         } catch (err) {
             console.log(err)
+            if (err.data.reroute) {
+                signOffUser(user)
+                setUser()
+                router.push('/')
+            }
         }
     }
 
@@ -112,7 +118,7 @@ export default function Dashboard() {
                      :
                     <UserPortrait fill={user.defaultColor} className="portrait-img"></UserPortrait>
                     }
-                    <span className="status-indi"></span>
+                    <span className={`status-indi ${user.status === 'offline' && 'offline'}`}></span>
                     </div>
 
                    

@@ -21,3 +21,20 @@ exports.user_check_get = async (req, res) => {
         })
     }
 }
+
+exports.user_status_update_post = async (req, res) => {
+    try {
+        const user = await User.findById(req.body.userId)
+
+        user.status = req.body.newStatus
+        await user.save()
+
+        res.json({
+            success: true
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
