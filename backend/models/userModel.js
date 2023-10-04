@@ -34,10 +34,11 @@ const UserSchema = new Schema({
         type:String,
         required:true
     },
-    friends: {
-        type:Schema.ObjectId,
-        ref: 'User'
-    },
+    friends: [{
+        type:[{type:Schema.ObjectId,
+        ref: 'User'}],
+        default: []
+    }],
     email: {
         type: String,
         unique:true

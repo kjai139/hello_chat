@@ -54,7 +54,7 @@ export default function Dashboard() {
 
         } catch (err) {
             console.log(err)
-            if (err.data.reroute) {
+            if (err.response.data.reroute) {
                 signOffUser(user)
                 setUser()
                 router.push('/')
@@ -91,18 +91,25 @@ export default function Dashboard() {
             
             <div className="bg-dgray text-white p-6 flex flex-col">
                 <div className="flex justify-center w-full">
-                    <ul className="flex flex-col gap-4">
+                    <ul className="flex flex-col gap-4 w-full">
                         <li className="flex gap-4 userUi">
-                            <Contact width="23" height="23" fill="white"></Contact>
-                            <h1>Contacts</h1>
+                           <div className="w-4 flex items-center ">
+                            <Contact fill="white" className="portrait-img"></Contact>
+                            </div>
+                            <h1 className="flex-1">Friends</h1>
+                           
                         </li>
                         <li className="flex gap-4 userUi">
+                            <div className="w-4 flex items-center ">
                             <Settings className="portrait-img" fill="white"></Settings>
-                            <h1>Settings</h1>
+                            </div>
+                            <h1 className="flex-1">Settings</h1>
                         </li>
                         <li className="flex gap-4 userUi" onClick={signOut}>
+                            <div className="w-4 flex items-center">
                             <SignOff className="portrait-img" fill="white"></SignOff>
-                            <h1 className="w-full">Sign out</h1>
+                            </div>
+                            <h1 className="flex-1">Sign out</h1>
                         </li>
                     </ul>
                 </div>

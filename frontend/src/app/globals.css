@@ -52,9 +52,19 @@
   cursor: pointer;
 }
 
+.userUi {
+  align-items: center;
+  justify-content: center;
+  border: 4px solid transparent;
+  padding: 2px;
+}
+
 .userUi:hover {
   cursor: pointer;
-  text-decoration: underline;
+  border: 4px solid var(--hoverC);
+  background-color: var(--hoverC);
+  border-radius: 4px;
+  
 }
 
 .selected-top {
