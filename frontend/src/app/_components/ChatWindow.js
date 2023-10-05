@@ -7,7 +7,7 @@ import { addMinutes, format, isToday, isWithinInterval, isYesterday, parseISO } 
 import { userContext } from "../_context/authContext"
 
 
-const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
+const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
 
     
     const [message, setMessage] = useState('')
@@ -158,7 +158,12 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
             
             </div>
             <div className="text-white p-4 flex flex-col gap-4 overflow-y-auto" ref={chatRef}>
-            {msgs ? msgs.map((node, idx) => {
+            {blankMsg && 
+                <div>
+                <h1>Say hi to {selectedUser.username}~</h1>
+                </div>
+            }
+            {msgs && msgs.map((node, idx) => {
                 console.log(node, 'node')
 
                 let parsedDate = parseISO(node.timestamp)
@@ -190,9 +195,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs}) => {
                         </div>
                     </div>    
                 )
-            }): <div>
-                    <h1>Say hi to {selectedUser.username}~</h1>
-                </div>}
+            })}
             </div>
             {
                 selectedUser &&

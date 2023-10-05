@@ -12,6 +12,7 @@ import UserPortrait from '../../../svgs/userPortrait.svg'
 import ChatWindow from "../_components/ChatWindow"
 import DirectMessages from "../_components/DirectMessage"
 import axiosInstance from '../../../axios'
+import Profile from "../_components/Profile"
 
 
 
@@ -23,6 +24,9 @@ export default function Dashboard() {
 
     const [needRefresh, setNeedRefresh] = useState(false)
     const [messageArr, setmessageArr] = useState([])
+
+    const [selectedTab, setSelectedTab] = useState('')
+    const [isBlank, setIsBlank] = useState(false)
 
     
 
@@ -64,7 +68,8 @@ export default function Dashboard() {
 
     const selectUser = async (user) => {
         setSelectedUser(user)
-        setmessageArr()
+        setIsBlank(false)
+        setmessageArr(null)
         console.log(user, 'selected')
         try {
             const response = await axiosInstance.post('api/convo/get', {
@@ -77,6 +82,11 @@ export default function Dashboard() {
             if (response.data.success) {
                 console.log(response.data.messageArr)
                 setmessageArr(response.data.messageArr)
+                setSelectedTab('chat')
+            } else {
+                setSelectedTab('chat')
+                setIsBlank(true)
+                
             }
         } catch (err) {
             console.log(err)
@@ -99,7 +109,7 @@ export default function Dashboard() {
                             <h1 className="flex-1">Friends</h1>
                            
                         </li>
-                        <li className="flex gap-4 userUi">
+                        <li className="flex gap-4 userUi" onClick={() => setSelectedTab('settings')}>
                             <div className="w-4 flex items-center ">
                             <Settings className="portrait-img" fill="white"></Settings>
                             </div>
@@ -142,8 +152,11 @@ export default function Dashboard() {
                 
 
             </div>
-            <div className="col-span-2 bg-ltgray flex flex-col">
-                {user && <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr} setMsgs={setmessageArr}></ChatWindow>}
+            <div className="col-span-2 bg-ltgray flex flex-col text-white">
+                {user && selectedTab === 'chat' && <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr} setMsgs={setmessageArr} blankMsg={isBlank}></ChatWindow>}
+                {selectedTab === 'settings' && user &&
+                <Profile user={user}></Profile>
+                }
 
             </div>
             
