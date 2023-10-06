@@ -32,10 +32,15 @@ const Profile = ({user}) => {
         e.preventDefault()
         console.log(imageRef.current.files[0])
         const img = imageRef.current.files[0]
+        
+
         if (img) {
+            const formData = new FormData()
+            formData.append('uploadedImg', img)
+            formData.append('filename', img.name)
             try {
-                const response = await axiosInstance.post('/api/image/upload', {
-                    image: img
+                const response = await axiosInstance.post('/api/image/upload', formData, {
+                    withCredentials: true
                 })
             } catch (err) {
                 console.log(err)
