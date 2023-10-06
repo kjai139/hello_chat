@@ -200,7 +200,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
             {
                 selectedUser &&
                 <form onSubmit={sendMessage} className="p-4 flex items-end flex-1">
-                    <textarea placeholder={`Message@${selectedUser.username}`} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyPress} className="resize-none w-full p-2"></textarea>
+                    <textarea placeholder={`Message@${selectedUser.username}`} value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={handleKeyPress} className="resize-none w-full p-2 text-black"></textarea>
                 </form>
             }
 

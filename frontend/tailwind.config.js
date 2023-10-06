@@ -29,6 +29,9 @@ module.exports = {
         'dgray': '#444753',
         'lgray': '#444753f0',
         'ltgray' : '#444753de'
+      },
+      flex: {
+        '2': '2 2 0%'
       }
       
       
