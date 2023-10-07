@@ -2,18 +2,22 @@
 
 import { Readex_Pro } from 'next/font/google'
 import UserPortrait from '../../../svgs/userPortrait.svg'
-import { useRef, useState } from "react"
+import { Suspense, useRef, useState } from "react"
 import Image from 'next/image'
 import axiosInstance from '../../../axios'
+import { useRouter } from 'next/navigation'
+import ResultModal from './modals/resultModal'
+import Spinner from './Loader'
 
 
 
 const Profile = ({user}) => {
 
     const [selectedImageUrl, setSelectedImageUrl] = useState()
-    
+    const [resultMsg, setResultMsg] = useState('')
 
     const imageRef = useRef()
+    const router = useRouter()
 
     const handleUploadImg = (e) => {
         
@@ -36,25 +40,41 @@ const Profile = ({user}) => {
 
         if (img) {
             const formData = new FormData()
-            formData.append('uploadedImg', img)
+            formData.append('image', img)
             formData.append('filename', img.name)
             try {
                 const response = await axiosInstance.post('/api/image/upload', formData, {
                     withCredentials: true
                 })
+
+                console.log(response.data.message)
+                if (response.data.success) {
+                    setResultMsg(response.data.message)
+                }
             } catch (err) {
                 console.log(err)
+                if (err.response.data.reroute) {
+                    router.push('/')
+                }
             }
         }
     }
 
     const clearImage = (e) => {
         e.preventDefault()
+        
         setSelectedImageUrl(null)
         imageRef.current.value = ''
     }
     return (
-        <div className="flex flex-col flex-1 max-h-screen">
+        <div className="flex flex-col flex-1 max-h-screen relative">
+            
+            {resultMsg && 
+            
+            <ResultModal resultMsg={resultMsg} closeModal={() => setResultMsg('')}></ResultModal>
+            
+            }
+            
             <span className='border-b-2 p-4'>
                 <h1 className="text-xl font-bold">User Settings</h1>
             </span>
@@ -70,7 +90,7 @@ const Profile = ({user}) => {
                 <div className="flex">
                     <div className='flex items-center gap-2'>
                         {user.image && !selectedImageUrl &&
-                            <div className='portrait-img flex'>
+                            <div className='portrait-img flex h-8 w-8'>
                             <Image src={user.image} width={30} height={30} style={{
                                 borderRadius: '50%'
                             }}></Image>

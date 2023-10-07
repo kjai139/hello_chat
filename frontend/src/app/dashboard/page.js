@@ -129,8 +129,11 @@ export default function Dashboard() {
                     <div className="w-8 relative">
                     {user.image ?
                     
-                    <Image src={user.image}></Image>
-                    
+                    <div className='portrait-img flex h-8 w-8'>
+                            <Image src={user.image} width={30} height={30} style={{
+                                borderRadius: '50%'
+                            }}></Image>
+                    </div>
                     
                      :
                     <UserPortrait fill={user.defaultColor} className="portrait-img"></UserPortrait>

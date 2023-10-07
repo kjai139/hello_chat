@@ -28,6 +28,13 @@ const nextConfig = {
         return config
         
       },
+      images: {
+        remotePatterns: [
+          {
+            hostname:'hellochatbucket.s3.us-east-2.amazonaws.com'
+          }
+        ]
+      }
       
       
     

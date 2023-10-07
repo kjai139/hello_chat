@@ -128,7 +128,7 @@
   }
 
   .overlay {
-    @apply z-0 absolute top-0 left-0 w-full h-full bg-transparent justify-center flex;
+    @apply z-0 absolute top-0 left-0 w-full h-full bg-transparent justify-center items-center flex;
   }
 
   

@@ -96,7 +96,8 @@ exports.account_login_post = async (req, res) => {
                 friends: user.friends,
                 email: user.email,
                 defaultColor: user.defaultColor,
-                status: user.status
+                status: user.status,
+                image: user.image
             }, process.env.JWT_SECRET_KEY, {
                 expiresIn: '1hr'
             })
