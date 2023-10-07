@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3')
+const { S3Client, PutObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3')
 const debug = require('debug')('hello_chat:imageController')
 require('dotenv').config()
 const User = require('../models/userModel')
@@ -37,13 +37,36 @@ exports.image_upload_post = async (req, res) => {
         const command = new PutObjectCommand(params)
         const response = await s3Client.send(command)
 
-        const curUser = await User.findByIdAndUpdate(req.user._id, {
-            image: `https://${bucketname}.s3.us-east-2.amazonaws.com/${params.Key}`
-        })
-        res.json({
-            message: `User avatar updated.`,
-            success: true
-        })
+        const targetUser = await User.findById(req.user._id)
+        const olds3 = targetUser.image
+        if (olds3) {
+            const objKey = olds3.split('amazonaws.com/')[1]
+
+            const deleteParams = {
+                Bucket: bucketname,
+                Key: objKey,
+
+            }
+
+            const deleteCmd = new DeleteObjectCommand(deleteParams)
+            await s3Client.send(deleteCmd)
+            debug('old s3 img deleted')
+            targetUser.image = `https://${bucketname}.s3.us-east-2.amazonaws.com/${params.Key}`
+            await targetUser.save()
+            res.json({
+                message: `User avatar updated.`,
+                success: true
+            })
+        } else {
+            debug('fresh img saving to s3...')
+            targetUser.image = `https://${bucketname}.s3.us-east-2.amazonaws.com/${params.Key}`
+            await targetUser.save()
+            res.json({
+                message: `User avatar updated.`,
+                success: true
+            })
+        }
+
     } catch (err) {
         res.status(500).json({
             message: err
