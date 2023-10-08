@@ -13,6 +13,7 @@ import ChatWindow from "../_components/ChatWindow"
 import DirectMessages from "../_components/DirectMessage"
 import axiosInstance from '../../../axios'
 import Profile from "../_components/Profile"
+import socket from "../../../socket"
 
 
 
@@ -28,6 +29,7 @@ export default function Dashboard() {
     const [selectedTab, setSelectedTab] = useState('')
     const [isBlank, setIsBlank] = useState(false)
 
+    const [highlight, setHighlight] = useState()
     
 
     useEffect(() => {
@@ -35,6 +37,50 @@ export default function Dashboard() {
         
         
     }, [])
+
+    useEffect(() => {
+        console.log(selectedUser, 'selected user on mount')
+        if (!socket.connected) {
+            socket.connect()
+            
+            
+            
+        }
+
+        socket.on('connect', () => {
+            console.log('client connected:', socket.id)
+        })
+        socket.on('message', (data) => {
+            console.log('received msg from ws:', data)
+            setmessageArr(prev => [...prev, data])
+        })
+        socket.on('sameUserMsg', (data) => {
+            console.log('received sameuserMsg from ws', data.content)
+            setmessageArr((prev) => {
+                const updatedMsgs = [...prev]
+                updatedMsgs[updatedMsgs.length - 1].content = data.content
+
+                return updatedMsgs
+            })
+        })
+        socket.on("disconnect", (reason) => {
+            console.log('dc reason', reason)
+        })
+        //have to make sure remove the listeners
+        return () => {
+            socket.removeAllListeners()
+            
+            socket.disconnect()
+        }
+    }, [])
+
+    useEffect(() => {
+        if (user) {
+            socket.emit('joinRoom', user._id)
+            
+        }
+    }, [user])
+
 
     useEffect(() => {
         if (needRefresh) {
@@ -109,11 +155,11 @@ export default function Dashboard() {
                             <h1 className="flex-1">Friends</h1>
                            
                         </li>
-                        <li className="flex gap-4 userUi" onClick={() => setSelectedTab('settings')}>
+                        <li className={ highlight === 'settings' ? `flex gap-4 userUi font-bold pointer-events-none` : `flex gap-4 userUi`} onClick={() => {setSelectedTab('settings'); setHighlight('settings')}}>
                             <div className="w-4 flex items-center ">
                             <Settings className="portrait-img" fill="white"></Settings>
                             </div>
-                            <h1 className="flex-1">Settings</h1>
+                            <h1 className={ highlight === 'settings' ? `flex-1 font-bold pointer-events-none` : `flex-1`}>Settings</h1>
                         </li>
                         <li className="flex gap-4 userUi" onClick={signOut}>
                             <div className="w-4 flex items-center">
@@ -130,7 +176,7 @@ export default function Dashboard() {
                     {user.image ?
                     
                     <div className='portrait-img flex h-8 w-8'>
-                            <Image src={user.image} width={30} height={30} style={{
+                            <Image src={user.image} width={30} height={30} alt="profileImg" style={{
                                 borderRadius: '50%'
                             }}></Image>
                     </div>
@@ -151,7 +197,7 @@ export default function Dashboard() {
             <div className="bg-lgray text-white flex flex-col items-center">
                 <span className={`text-sm w-full p-4 `}>DIRECT MESSAGES</span>
                 
-                <DirectMessages onSelect={selectUser}></DirectMessages>
+                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight}></DirectMessages>
                 
 
             </div>

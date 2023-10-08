@@ -5,10 +5,10 @@ import UserPortrait from '../../../svgs/userPortrait.svg'
 import { Robo } from '../fonts'
 
 
-const DirectMessages = ({onSelect}) => {
+const DirectMessages = ({onSelect, highlight, setHL}) => {
 
     const [suggestedUsers, setSuggestedUsers] = useState()
-    const [highlight, setHighlight] = useState()
+   
 
     useEffect(() => {
         getUserList()
@@ -31,7 +31,7 @@ const DirectMessages = ({onSelect}) => {
 
     const handleSelect = (node) => {
         onSelect(node)
-        setHighlight(node._id)
+        setHL(node._id)
 
     }
 

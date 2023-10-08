@@ -1,6 +1,6 @@
 
 
-import { Readex_Pro } from 'next/font/google'
+
 import UserPortrait from '../../../svgs/userPortrait.svg'
 import { Suspense, useRef, useState } from "react"
 import Image from 'next/image'
@@ -15,6 +15,7 @@ const Profile = ({user}) => {
 
     const [selectedImageUrl, setSelectedImageUrl] = useState()
     const [resultMsg, setResultMsg] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
 
     const imageRef = useRef()
     const router = useRouter()
@@ -34,6 +35,7 @@ const Profile = ({user}) => {
 
     const updateSettings = async (e) => {
         e.preventDefault()
+        setIsLoading(true)
         console.log(imageRef.current.files[0])
         const img = imageRef.current.files[0]
         
@@ -49,10 +51,12 @@ const Profile = ({user}) => {
 
                 console.log(response.data.message)
                 if (response.data.success) {
+                    setIsLoading(false)
                     setResultMsg(response.data.message)
                 }
             } catch (err) {
                 console.log(err)
+                setIsLoading(false)
                 if (err.response.data.reroute) {
                     router.push('/')
                 }
@@ -68,6 +72,7 @@ const Profile = ({user}) => {
     }
     return (
         <div className="flex flex-col flex-1 max-h-screen relative">
+            {isLoading && <Spinner></Spinner>}
             
             {resultMsg && 
             
@@ -91,7 +96,7 @@ const Profile = ({user}) => {
                     <div className='flex items-center gap-2'>
                         {user.image && !selectedImageUrl &&
                             <div className='portrait-img flex h-8 w-8'>
-                            <Image src={user.image} width={30} height={30} style={{
+                            <Image src={user.image} width={30} height={30} alt='uploaded-avatar' style={{
                                 borderRadius: '50%'
                             }}></Image>
                             </div>

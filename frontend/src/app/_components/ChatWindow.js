@@ -11,57 +11,17 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
 
     
     const [message, setMessage] = useState('')
-    const [chatlog, setChatLog] = useState()
-    const [isSocketConnected, setIsSocketConnected] = useState(false)
+    
     const chatRef = useRef(null)
 
-    useEffect(() => {
-        console.log(selectedUser, 'selected user on mount')
-        if (!socket.connected) {
-            socket.connect()
-            
-            
-            
-        }
-
-        socket.on('connect', () => {
-            console.log('client connected:', socket.id)
-        })
-        socket.on('message', (data) => {
-            console.log('received msg from ws:', data)
-            setMsgs(prev => [...prev, data])
-        })
-        socket.on('sameUserMsg', (data) => {
-            console.log('received sameuserMsg from ws', data.content)
-            setMsgs((prev) => {
-                const updatedMsgs = [...prev]
-                updatedMsgs[updatedMsgs.length - 1].content = data.content
-
-                return updatedMsgs
-            })
-        })
-        socket.on("disconnect", (reason) => {
-            console.log('dc reason', reason)
-        })
-        //have to make sure remove the listeners
-        return () => {
-            socket.removeAllListeners()
-            
-            socket.disconnect()
-        }
-    }, [])
+   
 
     useEffect(() => {
         
         requestAnimationFrame(scrollToBottom)
     }, [msgs])
 
-    useEffect(() => {
-        if (user) {
-            socket.emit('joinRoom', user._id)
-            
-        }
-    }, [user])
+  
 
     
 
