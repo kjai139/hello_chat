@@ -124,7 +124,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
                 </div>
             }
             {msgs && msgs.map((node, idx) => {
-                console.log(node, 'node')
+                // console.log(node, 'node')
 
                 let parsedDate = parseISO(node.timestamp)
 

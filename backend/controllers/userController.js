@@ -12,7 +12,8 @@ exports.user_check_get = async (req, res) => {
         }).limit(5)
 
         res.json({
-            users: userList
+            users: userList,
+            success: true
         })
 
     } catch (err) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense, useContext, useEffect, useState } from "react"
+import { Suspense, useContext, useEffect, useRef, useState } from "react"
 import {checkLoginStatus, signOffUser} from "../_modules/auth"
 import { useRouter, usePathname } from "next/navigation"
 import { userContext } from "../_context/authContext"
@@ -23,13 +23,21 @@ export default function Dashboard() {
     const pathname = usePathname()
     const { user, setUser, selectedUser, setSelectedUser} = useContext(userContext)
 
-    const [needRefresh, setNeedRefresh] = useState(false)
+    
     const [messageArr, setmessageArr] = useState([])
 
     const [selectedTab, setSelectedTab] = useState('')
     const [isBlank, setIsBlank] = useState(false)
 
     const [highlight, setHighlight] = useState()
+
+    // localstorage last selected
+    const tabRef = useRef(null)
+    const [prevRefId, setPrevRefId] = useState()
+
+    //for friendlist
+    const [suggestedUsers, setSuggestedUsers] = useState()
+    
     
 
     useEffect(() => {
@@ -63,6 +71,10 @@ export default function Dashboard() {
                 return updatedMsgs
             })
         })
+
+        socket.on('friend-login-status', (data) => {
+            console.log('emit from login', data)
+        })
         socket.on("disconnect", (reason) => {
             console.log('dc reason', reason)
         })
@@ -81,13 +93,57 @@ export default function Dashboard() {
         }
     }, [user])
 
+   
 
     useEffect(() => {
-        if (needRefresh) {
-            checkLoginStatus(pathname, router, setUser)
-            setNeedRefresh(false)
+        if (user) {
+            getUserList()
         }
-    }, [needRefresh])
+        
+    }, [user])
+
+    const getUserList = async () => {
+        try {
+            const response = await axiosInstance.get('/api/users/get', {
+                withCredentials: true
+            })
+
+
+            console.log(response.data.users, 'userlist')
+            setSuggestedUsers(response.data.users)
+            socket.emit('login-status', {
+                status: user.status,
+                friends: response.data.users,
+                sender: user._id
+            })
+            
+
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
+    useEffect(() => {
+        const prevUserState = localStorage.getItem('lastSelected')
+       
+
+        if (prevUserState && !prevRefId) {
+            console.log('prev selected:', prevUserState)
+            console.log('tableref cur', tabRef.current)
+            console.log(!prevRefId)
+            setPrevRefId(prevUserState)
+            setTimeout(() => {
+                if (tabRef.current) {
+                    tabRef.current.click()
+                }
+            }, 1000)
+            
+        } else if (!prevUserState) {
+            setPrevRefId('nothing')
+        }
+    }, [])
+
+   
 
     const signOut = async () => {
         const userId = user._id
@@ -142,6 +198,12 @@ export default function Dashboard() {
         }
     }
 
+    const selectUiTab = (tab) => {
+        setSelectedTab(tab) 
+        setHighlight(tab);
+        
+    }
+
     return (
         <main className="mx-auto max-w-5xl grid grid-cols-4 h-screen">
             
@@ -155,7 +217,7 @@ export default function Dashboard() {
                             <h1 className="flex-1">Friends</h1>
                            
                         </li>
-                        <li className={ highlight === 'settings' ? `flex gap-4 userUi font-bold pointer-events-none` : `flex gap-4 userUi`} onClick={() => {setSelectedTab('settings'); setHighlight('settings')}}>
+                        <li className={ highlight === 'settings' ? `flex gap-4 userUi font-bold pointer-events-none` : `flex gap-4 userUi`} onClick={() => selectUiTab('settings')}>
                             <div className="w-4 flex items-center ">
                             <Settings className="portrait-img" fill="white"></Settings>
                             </div>
@@ -197,7 +259,7 @@ export default function Dashboard() {
             <div className="bg-lgray text-white flex flex-col items-center">
                 <span className={`text-sm w-full p-4 `}>DIRECT MESSAGES</span>
                 
-                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight}></DirectMessages>
+                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers}></DirectMessages>
                 
 
             </div>
