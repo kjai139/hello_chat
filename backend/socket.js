@@ -29,12 +29,14 @@ module.exports = (server) => {
             console.log(`User ${userId} has joinned room ${userId}`)
         })
 
-        socket.on('login-status', (userList) => {
-            userList.friends.forEach((frd) => {
+        socket.on('login-status', (sender) => {
+            sender.friends.forEach((frd) => {
                 console.log('friend Id from socket:', frd._id)
+                console.log('sender', sender.sender, 'status:', sender.status)
+                
                 socket.to(frd._id).emit('friend-login-status', {
-                    sender: frd.sender,
-                    status: frd.status
+                    sender: sender.sender,
+                    status: sender.status
                 })
                
             })

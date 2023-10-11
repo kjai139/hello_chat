@@ -39,3 +39,28 @@ exports.user_status_update_post = async (req, res) => {
         })
     }
 }
+
+exports.user_friends_add_get = async (req, res) => {
+    try {
+
+        const target = await User.find({normalized_name : req.query.name})
+
+        if (target.length > 0) {
+            res.json({
+                message: `found user ${target[0]}`,
+                friend: target[0],
+                success:true
+            })
+        } else {
+            res.json({
+                message: `Username does not exist.`
+            })
+        }
+        
+
+    } catch (err) {
+        res.status(500).json({
+            message:err.message
+        })
+    }
+}

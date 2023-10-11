@@ -2,7 +2,7 @@ const express = require('express')
 const { account_create_post, account_login_post } = require('../controllers/accountControllers')
 const isAuthenticated = require('../middleware/authentication')
 const { auth_check_get, auth_signout_delete } = require('../controllers/authController')
-const { user_check_get, user_status_update_post } = require('../controllers/userController')
+const { user_check_get, user_status_update_post, user_friends_add_get } = require('../controllers/userController')
 const { messages_post, message_edit } = require('../controllers/messageController')
 const { convo_get_post } = require('../controllers/convoController')
 const router = express.Router()
@@ -33,6 +33,7 @@ router.post('/user/status/update', isAuthenticated, user_status_update_post)
 
 router.post('/image/upload', isAuthenticated, upload.single('image'), image_upload_post)
 
+router.get('/users/add', isAuthenticated, user_friends_add_get)
 
 
 module.exports = router

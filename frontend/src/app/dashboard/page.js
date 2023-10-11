@@ -14,6 +14,7 @@ import DirectMessages from "../_components/DirectMessage"
 import axiosInstance from '../../../axios'
 import Profile from "../_components/Profile"
 import socket from "../../../socket"
+import FriendsTab from "../_components/FriendsTab"
 
 
 
@@ -35,10 +36,14 @@ export default function Dashboard() {
     const tabRef = useRef(null)
     const [prevRefId, setPrevRefId] = useState()
 
-    //for friendlist
+    //for free friendlist
     const [suggestedUsers, setSuggestedUsers] = useState()
     
-    
+    const [onlineFriends, setOnlineFriends] = useState([])
+
+    //real friendlist
+    const [friendList, setFriendList] = useState([])
+
 
     useEffect(() => {
         checkLoginStatus(pathname, router, setUser)
@@ -73,7 +78,14 @@ export default function Dashboard() {
         })
 
         socket.on('friend-login-status', (data) => {
-            console.log('emit from login', data)
+            console.log(`${data.status} emit from login`, data)
+            if (data.status === 'online') {
+                setOnlineFriends(prev => [...prev, data.sender])
+            } else if (data.status === 'offline') {
+                setOnlineFriends((prev) => {
+                    return prev.filter((id) => id !== data.sender)
+                })
+            }
         })
         socket.on("disconnect", (reason) => {
             console.log('dc reason', reason)
@@ -108,14 +120,16 @@ export default function Dashboard() {
                 withCredentials: true
             })
 
-
+            console.log('user from getuserlist', user)
             console.log(response.data.users, 'userlist')
             setSuggestedUsers(response.data.users)
+            setFriendList(user.friends)
             socket.emit('login-status', {
                 status: user.status,
                 friends: response.data.users,
                 sender: user._id
             })
+            console.log('online socket emitted to backend')
             
 
         } catch (err) {
@@ -151,6 +165,13 @@ export default function Dashboard() {
             const response = await axiosInstance.delete('api/auth/signout', {
                 withCredentials: true
             })
+
+            socket.emit('login-status', {
+                status: 'offline',
+                friends: suggestedUsers,
+                sender: userId
+            })
+            console.log('offline socket emitted to backend')
 
             if (response.data.ok) {
                 setUser()
@@ -210,7 +231,7 @@ export default function Dashboard() {
             <div className="bg-dgray text-white p-6 flex flex-col">
                 <div className="flex justify-center w-full">
                     <ul className="flex flex-col gap-4 w-full">
-                        <li className="flex gap-4 userUi">
+                        <li className={ highlight === 'friends' ? `flex gap-4 userUi font-bold pointer-events-none` : `flex gap-4 userUi`} onClick={() => selectUiTab('friends')}>
                            <div className="w-4 flex items-center ">
                             <Contact fill="white" className="portrait-img"></Contact>
                             </div>
@@ -259,7 +280,7 @@ export default function Dashboard() {
             <div className="bg-lgray text-white flex flex-col items-center">
                 <span className={`text-sm w-full p-4 `}>DIRECT MESSAGES</span>
                 
-                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers}></DirectMessages>
+                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers} onlineUsers={onlineFriends} friendList={friendList}></DirectMessages>
                 
 
             </div>
@@ -267,6 +288,9 @@ export default function Dashboard() {
                 {user && selectedTab === 'chat' && <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr} setMsgs={setmessageArr} blankMsg={isBlank}></ChatWindow>}
                 {selectedTab === 'settings' && user &&
                 <Profile user={user}></Profile>
+                }
+                {selectedTab === 'friends' && user &&
+                <FriendsTab></FriendsTab>
                 }
 
             </div>
