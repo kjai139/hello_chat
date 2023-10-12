@@ -15,7 +15,7 @@ const isAuthenticated = (req, res, next) => {
         next()
     } catch (err) {
         res.status(400).json({
-            message: 'Invalid or expired token',
+            message: 'Invalid or expired token. Please log in.',
             reroute: true
         })
     }

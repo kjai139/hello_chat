@@ -9,7 +9,7 @@ exports.user_check_get = async (req, res) => {
             _id: {
                 $ne: req.user._id
             }
-        }).limit(5)
+        }).limit(3)
 
         res.json({
             users: userList,
@@ -61,6 +61,35 @@ exports.user_friends_add_get = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message:err.message
+        })
+    }
+}
+
+exports.user_fiends_add_post = async (req, res) => {
+    try {
+        const friendId = req.body.id
+        const target = await User.findById(req.user._id)
+
+        const doesFriendExist = target.friends.some(obj => obj._id === req.body.id)
+
+        if (doesFriendExist) {
+            res.json({
+                message: 'User is already your friend.'
+            })
+        } else {
+            const updatedFriends = [...target.friends, friendId]
+            target.friends = updatedFriends
+            await target.save()
+            res.json({
+                success: true,
+                updatedFriends: target,
+                message: 'User added to friends.'
+            })
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
         })
     }
 }

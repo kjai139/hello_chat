@@ -73,7 +73,7 @@ exports.account_login_post = async (req, res) => {
     try {
         const user = await User.findOne({
             username: username
-        })
+        }).populate('friends')
 
         debug('user', user)
 

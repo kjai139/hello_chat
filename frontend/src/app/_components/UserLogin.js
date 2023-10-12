@@ -128,7 +128,7 @@ const UserLogin = () => {
    
 
     return (
-        <div className="shadow-cont p-4 animate-slide-in">
+        <div className="shadow-cont p-4 animate-slide-in bg-white rounded-lg">
             {isLoading &&
             <Spinner></Spinner> 
             }

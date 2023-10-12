@@ -40,7 +40,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
 
         
 
-        if (msgs.length > 0) {
+        if (!blankMsg && msgs.length > 0) {
             const dateNow = new Date()
             const lastMsg = msgs[msgs.length -1 ]
             const lastMsgId = lastMsg._id
@@ -95,6 +95,25 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
                 }
             }
 
+        } else {
+            console.log('first msg')
+            try {
+                const response = await axiosInstance.post('/api/messages/send', {
+                    message: message,
+                    users: [user._id, selectedUser._id],
+                    sender: user._id,
+                    recipientId: selectedUser._id
+                }, {
+                    withCredentials: true
+                })
+                console.log('message:', message)
+                console.log('users:', user, selectedUser)
+                if (response.data.success) {
+                    setMessage('')
+                }
+            } catch (err) {
+                console.log(err)
+            }
         }
         
 
@@ -141,8 +160,12 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
                 return (
                     <div className='flex gap-2' key={node._id}>
                         
-                        {node.image ? 
-                            <Image src={node.image} className='portrait-img'></Image> :
+                        {node.sender.image ? 
+                             <div className='portrait-img flex h-8 w-8'>
+                             <Image src={node.sender.image} width={30} height={30} alt="profileImg" style={{
+                                 borderRadius: '50%'
+                             }}></Image>
+                            </div> :
                             <UserPortrait className="portrait-img" fill={node.sender.defaultColor}></UserPortrait>
                             }
                         

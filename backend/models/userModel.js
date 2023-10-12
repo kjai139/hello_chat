@@ -35,9 +35,10 @@ const UserSchema = new Schema({
         required:true
     },
     friends: [{
-        type:[{type:Schema.ObjectId,
-        ref: 'User'}],
-        default: []
+        type:Schema.Types.ObjectId,
+        ref: 'User',
+        default: null
+        
     }],
     email: {
         type: String,

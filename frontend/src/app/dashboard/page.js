@@ -65,7 +65,13 @@ export default function Dashboard() {
         })
         socket.on('message', (data) => {
             console.log('received msg from ws:', data)
-            setmessageArr(prev => [...prev, data])
+            
+            setmessageArr(prev => {
+                if (prev === undefined) {
+                    prev = []
+                }
+                return [...prev, data]
+            })
         })
         socket.on('sameUserMsg', (data) => {
             console.log('received sameuserMsg from ws', data.content)
@@ -226,7 +232,7 @@ export default function Dashboard() {
     }
 
     return (
-        <main className="mx-auto max-w-5xl grid grid-cols-4 h-screen">
+        <main className="mx-auto max-w-5xl grid grid-cols-4 h-screen bg-black">
             
             <div className="bg-dgray text-white p-6 flex flex-col">
                 <div className="flex justify-center w-full">
@@ -290,7 +296,7 @@ export default function Dashboard() {
                 <Profile user={user}></Profile>
                 }
                 {selectedTab === 'friends' && user &&
-                <FriendsTab></FriendsTab>
+                <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers}></FriendsTab>
                 }
 
             </div>
