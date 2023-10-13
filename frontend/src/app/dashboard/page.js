@@ -43,6 +43,7 @@ export default function Dashboard() {
 
     //real friendlist
     const [friendList, setFriendList] = useState([])
+    const [pendingFriends, setPendingFriends] = useState([])
 
 
     useEffect(() => {
@@ -130,6 +131,7 @@ export default function Dashboard() {
             console.log(response.data.users, 'userlist')
             setSuggestedUsers(response.data.users)
             setFriendList(user.friends)
+            setPendingFriends(user.friendRequests)
             socket.emit('login-status', {
                 status: user.status,
                 friends: response.data.users,
@@ -296,7 +298,7 @@ export default function Dashboard() {
                 <Profile user={user}></Profile>
                 }
                 {selectedTab === 'friends' && user &&
-                <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers}></FriendsTab>
+                <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers} pendingRequests={pendingFriends} onlineUsers={onlineFriends}></FriendsTab>
                 }
 
             </div>

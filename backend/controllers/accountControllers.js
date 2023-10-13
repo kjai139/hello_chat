@@ -73,7 +73,7 @@ exports.account_login_post = async (req, res) => {
     try {
         const user = await User.findOne({
             username: username
-        }).populate('friends')
+        }).populate('friends').populate('friendRequests')
 
         debug('user', user)
 
@@ -94,6 +94,7 @@ exports.account_login_post = async (req, res) => {
                 username: user.username,
                 normalized_name: user.normalized_name,
                 friends: user.friends,
+                friendRequests: user.friendRequests,
                 email: user.email,
                 defaultColor: user.defaultColor,
                 status: user.status,

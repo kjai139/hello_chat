@@ -69,21 +69,66 @@ exports.user_fiends_add_post = async (req, res) => {
     try {
         const friendId = req.body.id
         const target = await User.findById(req.user._id)
+        const thefriend = await User.findById(req.body.id)
 
-        const doesFriendExist = target.friends.some(obj => obj._id === req.body.id)
+        const doesFrdExist = target.friends.some(obj => obj._id === req.body.id)
+        const doesFrdHaveUser = thefriend.friends.some(obj => obj._id === req.user._id)
 
-        if (doesFriendExist) {
+        if (doesFrdExist || doesFrdHaveUser) {
             res.json({
-                message: 'User is already your friend.'
+                message: 'Error: User is already your friend or they already have you as a friend.'
             })
+            
         } else {
-            const updatedFriends = [...target.friends, friendId]
-            target.friends = updatedFriends
+            const updatedFrds = [...target.friends, friendId]
+            
+            const updatedFriendsFrds = [...thefriend.friends, req.user._id]
+
+            target.friends = updatedFrds
+            thefriend.friends = updatedFriendsFrds
             await target.save()
+            await thefriend.save()
             res.json({
                 success: true,
                 updatedFriends: target,
                 message: 'User added to friends.'
+            })
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
+exports.user_fiends_sendRequest_post = async (req, res) => {
+    try {
+        const friendId = req.body.id
+        const target = await User.findById(friendId)
+        const requester = await User.findById(req.user._id)
+
+        const targetReqExist = target.friendRequests.some(obj => obj._id === req.user._id)
+        const requesterReqExist = requester.friendRequests.some(obj => obj._id === friendId)
+
+        if (targetReqExist) {
+            res.json({
+                message: 'Friend request already pending.'
+            })
+        } else if (requesterReqExist) {
+            const filteredReq = requester.friendRequests.filter((obj) => obj._id !== friendId)
+            requester.friendRequests = filteredReq
+            await requester.save()
+            res.json({
+                addFriend: true
+            })
+        } else {
+            const updatedPending = [...target.friendRequests, req.user._id]
+            target.friendRequests = updatedPending
+            await target.save()
+            res.json({
+                success: true,
+                message: 'Friend request sent.'
             })
         }
 
