@@ -7,7 +7,7 @@ import Image from "next/image"
 import UserPortrait from '../../../svgs/userPortrait.svg'
 
 
-const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, onlineUsers}) => {
+const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, onlineUsers, setPendingRequests}) => {
 
     const [friendName, setFriendName] = useState('')
 
@@ -36,7 +36,7 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                 const inFreeFrds = freeFriends.some(obj => obj._id === friend._id)
                 const inPending = pendingRequests.some(obj => obj._id === friend._id)
                 //already friends
-                if (inFrds || inFreeFrds) {
+                if (inFrds) {
                     setResultMsg('User is already your friend.')
                     setFriendName('')
                 } else if (inPending) {
@@ -50,13 +50,20 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
 
                         if (response.data.success) {
                             setResultMsg(response.data.message)
-                            console.log(response.data.updatedFriends)
+                            console.log('new friend added from inpending', response.data.newFriend)
                             setFriendList((prev) => {
                                 if (prev === undefined) {
                                     prev = []
                                 }
-                                return [prev, ...response.data.updatedFriends]
+                                return [...prev, response.data.newFriend]
                             })
+
+                            const filteredPending = pendingRequests.filter((obj) => {
+                                return obj._id !== response.data.newFriend._id
+                            })
+
+                            setPendingRequests(filteredPending)
+                            
                         } else {
                             setResultMsg(response.data.message)
                         }
@@ -68,7 +75,7 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                             
                         }
                     }
-
+                    //not in pending or friends
                 } else {
                     try {
                         const response = await axiosInstance.post('api/users/sendReq', {
@@ -77,36 +84,10 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                             withCredentials: true
                         })
 
-                        if (response.data.addFriend) {
-                            try {
-                                const response = await axiosInstance.post('api/users/addFriend', {
-                                    id: friend._id
-                                }, {
-                                    withCredentials: true
-                                })
+                        if (response.data.success) {
+                           setResultMsg(response.data.message)
         
-                                if (response.data.success) {
-                                    setResultMsg(response.data.message)
-                                    console.log(response.data.updatedFriends)
-                                    setFriendList((prev) => {
-                                        if (prev === undefined) {
-                                            prev = []
-                                        }
-                                        return [prev, ...response.data.updatedFriends]
-                                    })
-                                } else {
-                                    setResultMsg(response.data.message)
-                                }
-                                
-                            } catch (err) {
-                                console.log(err, 'from nested add friends')
-                                if (err.response.data.reroute) {
-                                    setResultMsg(err.response.data.message)
-                                    
-                                }
-                            }
-        
-                        } else if (response.data.success) {
+                        } else {
                             setResultMsg(response.data.message)
                         }
                     } catch (err) {
@@ -137,6 +118,36 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
             setResultMsg('')
         }
     }
+
+    const acceptFriend = async (friendId) => {
+        console.log('accepting -', friendId)
+        try {
+            const response = await axiosInstance.post('api/users/addFriend', {
+                id: friendId
+            }, {
+                withCredentials: true
+            })
+
+            if (response.data.success) {
+                setResultMsg(response.data.message)
+                console.log(`friend ${friendId} added`)
+                setFriendList((prev) => {
+                    if (prev === undefined) {
+                        prev = []
+                    }
+                    return [...prev,response.data.newFriend]
+                })
+                const filteredPending = pendingRequests.filter((obj) => {
+                    return obj._id !== response.data.newFriend._id
+                })
+
+                setPendingRequests(filteredPending)
+            }
+
+        } catch (err) {
+
+        }
+    }
     return (
         <div className="flex flex-col flex-1 max-h-screen relative">
              <span className='border-b-2 p-4 selected-top'>
@@ -147,7 +158,7 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                 <label>Enter username:</label>
                 <input type="text" placeholder="Enter here..." onChange={handleFriendNameInput} className="p-1 text-black" value={friendName}></input>
                 <div className='mt-5 flex justify-end'>
-                    <button type='submit' className='border-2 px-2 py-1 rounded-lg bg-dgray border-dgray ' onClick={addFriend}>Add</button>
+                    <button type='submit' className='pending-btn' onClick={addFriend}>Add</button>
                 </div>
             </form>
             
@@ -157,7 +168,7 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
             {pendingRequests && 
             pendingRequests.map((node) => {
                 return (
-                    <div key={`pending-${node._id}`} className="flex">
+                    <div key={`pending-${node._id}`} className="flex p-4 gap-2 items-center">
                         
                     {node.image ?
                         <div className="w-8 relative">
@@ -179,6 +190,10 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                         }
                         
                         <span>{node.username}</span>
+                        <div className="flex gap-2 ml-auto">
+                        <button className="pending-btn" type="button" onClick={() => acceptFriend(node._id)}>Accept</button>
+                        <button className="pending-btn" type="button">Decline</button>
+                        </div>
                     </div>
                 
                 )

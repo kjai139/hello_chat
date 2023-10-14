@@ -128,9 +128,14 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
     }
     return (
         <div className="flex flex-col flex-1 max-h-screen">
-            <div className="flex p-4 gap-2 border-b-2 selected-top">
+            <div className="flex p-4 gap-2 border-b-2 selected-top items-center">
             {selectedUser && selectedUser.image ? 
-                <Image src={selectedUser.image} className='portrait-img'></Image> : selectedUser &&
+                <div className='portrait-img flex h-8 w-8'>
+                <Image src={selectedUser.image} className='portrait-img' width={30} height={30} alt="profileImg" style={{
+                    borderRadius:'50%'
+                }}></Image>
+                </div> 
+                : selectedUser &&
                 <UserPortrait className="portrait-img" fill={selectedUser && selectedUser.defaultColor && selectedUser.defaultColor}></UserPortrait>
             }
                 <span className="text-white font-bold">{selectedUser && selectedUser.username}</span>

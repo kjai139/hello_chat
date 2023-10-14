@@ -15,7 +15,7 @@ import axiosInstance from '../../../axios'
 import Profile from "../_components/Profile"
 import socket from "../../../socket"
 import FriendsTab from "../_components/FriendsTab"
-
+import { TiltNeon } from "../fonts"
 
 
 export default function Dashboard() {
@@ -244,6 +244,10 @@ export default function Dashboard() {
                             <Contact fill="white" className="portrait-img"></Contact>
                             </div>
                             <h1 className="flex-1">Friends</h1>
+                            <span className="flex gap-1">
+                            <h1 className={`${TiltNeon.className} text-red-500`}>NEW</h1>
+                            <h1 className="pending-count">{`${pendingFriends.length}`}</h1>
+                            </span>
                            
                         </li>
                         <li className={ highlight === 'settings' ? `flex gap-4 userUi font-bold pointer-events-none` : `flex gap-4 userUi`} onClick={() => selectUiTab('settings')}>
@@ -298,7 +302,7 @@ export default function Dashboard() {
                 <Profile user={user}></Profile>
                 }
                 {selectedTab === 'friends' && user &&
-                <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers} pendingRequests={pendingFriends} onlineUsers={onlineFriends}></FriendsTab>
+                <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers} pendingRequests={pendingFriends} onlineUsers={onlineFriends} setPendingRequests={setPendingFriends}></FriendsTab>
                 }
 
             </div>

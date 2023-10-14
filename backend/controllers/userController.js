@@ -1,14 +1,18 @@
 const User = require('../models/userModel')
-
+const debug = require('debug')('hello_chat:userController')
 
 
 
 exports.user_check_get = async (req, res) => {
     try {
         const userList = await User.find({
-            _id: {
-                $ne: req.user._id
-            }
+            
+                    _id: {
+                        $ne: req.user._id,
+                        $nin: req.user.friends
+                    }
+             
+           
         }).limit(3)
 
         res.json({
@@ -42,8 +46,9 @@ exports.user_status_update_post = async (req, res) => {
 
 exports.user_friends_add_get = async (req, res) => {
     try {
+        const normalizedUsername = req.query.name.toLowerCase()
 
-        const target = await User.find({normalized_name : req.query.name})
+        const target = await User.find({normalized_name : normalizedUsername})
 
         if (target.length > 0) {
             res.json({
@@ -73,6 +78,7 @@ exports.user_fiends_add_post = async (req, res) => {
 
         const doesFrdExist = target.friends.some(obj => obj._id === req.body.id)
         const doesFrdHaveUser = thefriend.friends.some(obj => obj._id === req.user._id)
+        const isInUserPending = target.friendRequests.some(obj => obj._id === req.body.id )
 
         if (doesFrdExist || doesFrdHaveUser) {
             res.json({
@@ -80,6 +86,13 @@ exports.user_fiends_add_post = async (req, res) => {
             })
             
         } else {
+            if (isInUserPending) {
+                debug('Friend is in user pending, updating user pending...')
+                const filteredPending = target.friendRequests.filter((obj) => {
+                    return obj._id !== req.body.id
+                })
+                target.friendRequests = filteredPending
+            }
             const updatedFrds = [...target.friends, friendId]
             
             const updatedFriendsFrds = [...thefriend.friends, req.user._id]
@@ -90,7 +103,7 @@ exports.user_fiends_add_post = async (req, res) => {
             await thefriend.save()
             res.json({
                 success: true,
-                updatedFriends: target,
+                newFriend: thefriend,
                 message: 'User added to friends.'
             })
         }
@@ -106,23 +119,16 @@ exports.user_fiends_sendRequest_post = async (req, res) => {
     try {
         const friendId = req.body.id
         const target = await User.findById(friendId)
-        const requester = await User.findById(req.user._id)
+        // const requester = await User.findById(req.user._id)
 
         const targetReqExist = target.friendRequests.some(obj => obj._id === req.user._id)
-        const requesterReqExist = requester.friendRequests.some(obj => obj._id === friendId)
+        // const requesterReqExist = requester.friendRequests.some(obj => obj._id === friendId)
 
         if (targetReqExist) {
             res.json({
                 message: 'Friend request already pending.'
             })
-        } else if (requesterReqExist) {
-            const filteredReq = requester.friendRequests.filter((obj) => obj._id !== friendId)
-            requester.friendRequests = filteredReq
-            await requester.save()
-            res.json({
-                addFriend: true
-            })
-        } else {
+        }  else {
             const updatedPending = [...target.friendRequests, req.user._id]
             target.friendRequests = updatedPending
             await target.save()

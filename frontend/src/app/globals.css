@@ -138,6 +138,14 @@ background-size: cover;
     @apply z-0 absolute top-0 left-0 w-full h-full bg-transparent justify-center items-center flex;
   }
 
+  .pending-btn {
+    @apply py-1 px-2 rounded-md border-dgray border-2 bg-dgray hover:opacity-80 active:ring-white active:ring
+  }
+
+  .pending-count {
+    @apply font-bold
+  }
+
   
 }
 
