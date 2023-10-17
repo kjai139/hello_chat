@@ -119,6 +119,28 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
         }
     }
 
+    const declineFriend = async (friendId) => {
+        try {
+            const response = await axiosInstance.post('api/users/declineFriend', {
+                id: friendId
+            }, {
+                withCredentials: true
+            })
+
+            if (response.data.success) {
+                console.log(`${friendId}'s friend request declined.`)
+                const filteredPending = pendingRequests.filter((obj) => {
+                    return obj._id !== friendId
+                })
+                setPendingRequests(filteredPending)
+            }
+
+            
+        } catch (err) {
+            console.log(err)
+        }
+    }
+
     const acceptFriend = async (friendId) => {
         console.log('accepting -', friendId)
         try {
@@ -145,7 +167,7 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
             }
 
         } catch (err) {
-
+            console.log(err, 'error from accepting friend')
         }
     }
     return (
@@ -192,7 +214,7 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                         <span>{node.username}</span>
                         <div className="flex gap-2 ml-auto">
                         <button className="pending-btn" type="button" onClick={() => acceptFriend(node._id)}>Accept</button>
-                        <button className="pending-btn" type="button">Decline</button>
+                        <button className="pending-btn" type="button" onClick={() => declineFriend(node._id)}>Decline</button>
                         </div>
                     </div>
                 

@@ -68,10 +68,12 @@ export default function Dashboard() {
             console.log('received msg from ws:', data)
             
             setmessageArr(prev => {
-                if (prev === undefined) {
-                    prev = []
+                if (!prev || prev.length === 0) {
+                    return [data]
+                } else {
+                    return [...prev, data]
                 }
-                return [...prev, data]
+                
             })
         })
         socket.on('sameUserMsg', (data) => {
@@ -128,10 +130,11 @@ export default function Dashboard() {
             })
 
             console.log('user from getuserlist', user)
-            console.log(response.data.users, 'userlist')
+            console.log(response.data.users, 'free friendlist')
+            console.log(response.data.newUser, 'updated User object on refresh')
             setSuggestedUsers(response.data.users)
-            setFriendList(user.friends)
-            setPendingFriends(user.friendRequests)
+            setFriendList(response.data.newUser.friends)
+            setPendingFriends(response.data.newUser.friendRequests)
             socket.emit('login-status', {
                 status: user.status,
                 friends: response.data.users,
@@ -246,7 +249,7 @@ export default function Dashboard() {
                             <h1 className="flex-1">Friends</h1>
                             <span className="flex gap-1">
                             <h1 className={`${TiltNeon.className} text-red-500`}>NEW</h1>
-                            <h1 className="pending-count">{`${pendingFriends.length}`}</h1>
+                            <h1 className="pending-count">{pendingFriends ? `${pendingFriends.length}`: `0`}</h1>
                             </span>
                            
                         </li>

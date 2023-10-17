@@ -146,6 +146,10 @@ background-size: cover;
     @apply font-bold
   }
 
+  .fl-btn {
+    @apply text-xs hover:text-red-500
+  }
+
   
 }
 

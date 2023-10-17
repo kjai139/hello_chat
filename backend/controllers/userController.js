@@ -15,8 +15,11 @@ exports.user_check_get = async (req, res) => {
            
         }).limit(3)
 
+        const theUser = await User.findById(req.user._id).populate('friends').populate('friendRequests')
+
         res.json({
             users: userList,
+            newUser: theUser,
             success: true
         })
 
@@ -141,6 +144,46 @@ exports.user_fiends_sendRequest_post = async (req, res) => {
     } catch (err) {
         res.status(500).json({
             message: err.message
+        })
+    }
+}
+
+exports.user_friends_decline = async (req, res) => {
+    try {
+        const friendId = req.body.id
+        const theUser = await User.findById(req.user._id)
+
+        const filteredPending = theUser.friendRequests.filter((obj) => {
+            debug('obj._id', obj._id, friendId)
+            debug('is objid same as friendid', obj._id !== friendId)
+            return obj._id.toString() !== friendId
+        })
+
+
+        debug('filteredPending', filteredPending)
+        debug('theUserFriendRequests', theUser.friendRequests)
+
+        theUser.friendRequests = filteredPending
+        await theUser.save()
+        res.json({
+            success: true,
+            message: `${req.body.id}'s friend request declined.`
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: err.message
+        })
+    }
+}
+
+exports.user_friends_delete = async (req, res) => {
+    try {
+        const friendId = req.query.id
+
+        const theUser = await User.findById(req.user._id)
+    } catch (err) {
+        res.status(500).json({
+            message:err.message
         })
     }
 }

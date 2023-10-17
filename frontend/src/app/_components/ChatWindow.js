@@ -142,7 +142,7 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
             
             </div>
             <div className="text-white p-4 flex flex-col gap-4 overflow-y-auto" ref={chatRef}>
-            {blankMsg && 
+            {blankMsg && !msgs &&
                 <div>
                 <h1>Say hi to {selectedUser.username}~</h1>
                 </div>
