@@ -4,18 +4,22 @@ const debug = require('debug')('hello_chat:userController')
 
 
 exports.user_check_get = async (req, res) => {
+
     try {
+        const theUser = await User.findById(req.user._id).populate('friends').populate('friendRequests')
+
+        
         const userList = await User.find({
             
                     _id: {
                         $ne: req.user._id,
-                        $nin: req.user.friends
+                        $nin: theUser.friends
                     }
              
            
         }).limit(3)
 
-        const theUser = await User.findById(req.user._id).populate('friends').populate('friendRequests')
+        
 
         res.json({
             users: userList,
@@ -79,9 +83,9 @@ exports.user_fiends_add_post = async (req, res) => {
         const target = await User.findById(req.user._id)
         const thefriend = await User.findById(req.body.id)
 
-        const doesFrdExist = target.friends.some(obj => obj._id === req.body.id)
-        const doesFrdHaveUser = thefriend.friends.some(obj => obj._id === req.user._id)
-        const isInUserPending = target.friendRequests.some(obj => obj._id === req.body.id )
+        const doesFrdExist = target.friends.some(obj => obj._id.toString() === req.body.id)
+        const doesFrdHaveUser = thefriend.friends.some(obj => obj._id.toString() === req.user._id)
+        const isInUserPending = target.friendRequests.some(obj => obj._id.toString() === req.body.id )
 
         if (doesFrdExist || doesFrdHaveUser) {
             res.json({
@@ -92,7 +96,7 @@ exports.user_fiends_add_post = async (req, res) => {
             if (isInUserPending) {
                 debug('Friend is in user pending, updating user pending...')
                 const filteredPending = target.friendRequests.filter((obj) => {
-                    return obj._id !== req.body.id
+                    return obj._id.toString() !== req.body.id
                 })
                 target.friendRequests = filteredPending
             }
@@ -179,8 +183,36 @@ exports.user_friends_decline = async (req, res) => {
 exports.user_friends_delete = async (req, res) => {
     try {
         const friendId = req.query.id
+        
 
         const theUser = await User.findById(req.user._id)
+
+        const filteredFriends = theUser.friends.filter((obj) => {
+            return obj._id.toString() !== friendId
+        })
+
+        theUser.friends = filteredFriends
+
+        debug('THE USER FROM DELETE FRIENDs', theUser)
+
+        const theFriend = await User.findById(req.query.id)
+
+        const filteredFriendsFriends = theFriend.friends.filter((obj) => {
+            return obj._id.toString() !== req.user._id
+        })
+
+        theFriend.friends = filteredFriendsFriends
+
+        await theUser.save()
+        await theFriend.save()
+
+        res.json({
+            newUser: theUser,
+            message: `Friend ${friendId} deleted.`,
+            success: true
+        })
+
+
     } catch (err) {
         res.status(500).json({
             message:err.message

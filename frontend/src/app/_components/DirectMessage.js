@@ -5,7 +5,7 @@ import UserPortrait from '../../../svgs/userPortrait.svg'
 import { Robo } from '../fonts'
 
 
-const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggestedUsers, onlineUsers, friendList}) => {
+const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggestedUsers, onlineUsers, friendList, setFriendList}) => {
 
     
 
@@ -21,6 +21,13 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
             const response = await axiosInstance.delete(`/api/users/deleteFriend?id=${friendId}`, {
                 withCredentials: true
             })
+
+            if (response.data.success) {
+                setFriendList((prev) => {
+                    return prev.filter(friend => friend._id !== friendId)
+                })
+                console.log(response.data.message)
+            }
 
             if (response.data.success) {
                 console.log(`friend ${friendId} deleted.`)
@@ -118,10 +125,10 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
                          </div>
  
                      </div>
-                     <button type='button' className='fl-btn'>Delete Friend</button>
+                     <button type='button' className='fl-btn' onClick={() => deleteFriend(node._id)}>Delete Friend</button>
                      </li> 
                      : 
-                     <li key={`${node._id}-fl`} className='flex'>
+                     <li key={`${node._id}-fl`} className='flex justify-between'>
                     <div className={highlight === node._id ? `flex p-2 hover:border-black rounded-lg border-4 border-transparent friendlist font-bold pointer-events-none` : `flex p-2 hover:border-black rounded-lg border-4 border-transparent friendlist`} onClick={() => handleSelect(node)}>
                      <div className='flex w-full justify-start items-center gap-2'>
                      <div className="w-8 relative">
@@ -143,7 +150,7 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
                      </div>
 
                  </div>
-                 <button type='button' className='fl-btn'>Delete Friend</button>
+                 <button type='button' className='fl-btn' onClick={() => deleteFriend(node._id)}>Delete Friend</button>
                 </li>
                     
                     

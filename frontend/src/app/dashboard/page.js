@@ -295,7 +295,7 @@ export default function Dashboard() {
             <div className="bg-lgray text-white flex flex-col items-center">
                 <span className={`text-sm w-full p-4 `}>DIRECT MESSAGES</span>
                 
-                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers} onlineUsers={onlineFriends} friendList={friendList}></DirectMessages>
+                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers} onlineUsers={onlineFriends} friendList={friendList} setFriendList={setFriendList}></DirectMessages>
                 
 
             </div>
@@ -305,7 +305,7 @@ export default function Dashboard() {
                 <Profile user={user}></Profile>
                 }
                 {selectedTab === 'friends' && user &&
-                <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers} pendingRequests={pendingFriends} onlineUsers={onlineFriends} setPendingRequests={setPendingFriends}></FriendsTab>
+                <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers} pendingRequests={pendingFriends} onlineUsers={onlineFriends} setPendingRequests={setPendingFriends} setFreeFriends={setSuggestedUsers}></FriendsTab>
                 }
 
             </div>

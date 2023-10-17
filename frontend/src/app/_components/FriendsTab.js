@@ -7,7 +7,7 @@ import Image from "next/image"
 import UserPortrait from '../../../svgs/userPortrait.svg'
 
 
-const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, onlineUsers, setPendingRequests}) => {
+const FriendsTab = ({friendList, setFriendList, freeFriends, setFreeFriends, pendingRequests, onlineUsers, setPendingRequests}) => {
 
     const [friendName, setFriendName] = useState('')
 
@@ -56,6 +56,10 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                                     prev = []
                                 }
                                 return [...prev, response.data.newFriend]
+                            })
+
+                            setFreeFriends((prev) => {
+                                return prev.filter((obj) => obj._id.toString() !== friend._id)
                             })
 
                             const filteredPending = pendingRequests.filter((obj) => {
@@ -159,6 +163,12 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, pendingRequests, on
                     }
                     return [...prev,response.data.newFriend]
                 })
+
+                setFreeFriends((prev) => {
+                    return prev.filter((obj) => obj._id !== friendId)
+                })
+
+                
                 const filteredPending = pendingRequests.filter((obj) => {
                     return obj._id !== response.data.newFriend._id
                 })
