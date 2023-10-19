@@ -86,16 +86,26 @@ export default function Dashboard() {
             })
         })
 
+        socket.on('userLogged', (data) => {
+            console.log('received emit from userlogged')
+            router.push('/')
+        })
+
         socket.on('friend-login-status', (data) => {
             console.log(`${data.status} emit from login`, data)
             if (data.status === 'online') {
                 setOnlineFriends(prev => [...prev, data.sender])
+                console.log('online frds1 :', onlineFriends)
             } else if (data.status === 'offline') {
                 setOnlineFriends((prev) => {
                     return prev.filter((id) => id !== data.sender)
                 })
+                socket.emit('redirectReq', {
+                    sender: data.sender
+                })
             }
         })
+        
         socket.on("disconnect", (reason) => {
             console.log('dc reason', reason)
         })
@@ -132,12 +142,13 @@ export default function Dashboard() {
             console.log('user from getuserlist', user)
             console.log(response.data.users, 'free friendlist')
             console.log(response.data.newUser, 'updated User object on refresh')
-            setSuggestedUsers(response.data.users)
+            setSuggestedUsers(response.data.freeFriends)
             setFriendList(response.data.newUser.friends)
             setPendingFriends(response.data.newUser.friendRequests)
             socket.emit('login-status', {
                 status: user.status,
-                friends: response.data.users,
+                friends: response.data.newUser.friends,
+                freeFriends: response.data.freeFriends,
                 sender: user._id
             })
             console.log('online socket emitted to backend')
@@ -177,17 +188,27 @@ export default function Dashboard() {
                 withCredentials: true
             })
 
-            socket.emit('login-status', {
-                status: 'offline',
-                friends: suggestedUsers,
-                sender: userId
-            })
-            console.log('offline socket emitted to backend')
-
             if (response.data.ok) {
+                console.log('response data on logout', response.data.friends)
+
+                
+                socket.emit('login-status', {
+                    status: 'offline',
+                    freeFriends: suggestedUsers,
+                    friends: response.data.friends.friends,
+                    sender: response.data.friends._id
+                })
+                
+                
+                
                 setUser()
-                router.push('/')
+                
             }
+
+            
+            
+
+           
 
 
         } catch (err) {

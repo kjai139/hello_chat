@@ -19,7 +19,7 @@ exports.auth_check_get = async (req, res) => {
 exports.auth_signout_delete = async (req, res) => {
     try {
         debug('req.user from signout ', req.user)
-        const user = await User.findByIdAndUpdate(req.user._id, {status: 'offline'})
+        const user = await User.findByIdAndUpdate(req.user._id, {status: 'offline'}).populate('friends')
         
 
 
@@ -32,6 +32,7 @@ exports.auth_signout_delete = async (req, res) => {
 
         res.json({
             message: 'user has successfully signed out', 
+            friends: user,
             ok: true
         })
     } catch (err) {

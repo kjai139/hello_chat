@@ -1,6 +1,6 @@
 const User = require('../models/userModel')
 const debug = require('debug')('hello_chat:userController')
-
+const SocketIoConfig = require('../socket')
 
 
 exports.user_check_get = async (req, res) => {
@@ -21,8 +21,11 @@ exports.user_check_get = async (req, res) => {
 
         
 
+       
+        
+
         res.json({
-            users: userList,
+            freeFriends: userList,
             newUser: theUser,
             success: true
         })
@@ -139,6 +142,9 @@ exports.user_fiends_sendRequest_post = async (req, res) => {
             const updatedPending = [...target.friendRequests, req.user._id]
             target.friendRequests = updatedPending
             await target.save()
+            SocketIoConfig.io.to(friendId).emit('incFrdReq', {
+                newPending: req.user._id
+            })
             res.json({
                 success: true,
                 message: 'Friend request sent.'
