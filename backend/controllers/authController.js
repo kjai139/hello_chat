@@ -1,5 +1,6 @@
 const debug = require('debug')('hello_chat:authController')
 const User = require('../models/userModel')
+const SocketIoConfig = require('../socket')
 
 exports.auth_check_get = async (req, res) => {
     debug('req user from auth check', req.user)
@@ -20,6 +21,17 @@ exports.auth_signout_delete = async (req, res) => {
     try {
         debug('req.user from signout ', req.user)
         const user = await User.findByIdAndUpdate(req.user._id, {status: 'offline'}).populate('friends')
+
+        const recipients = user.friends.concat(req.body.freeFriends)
+        debug('recipents on logout', recipients)
+        
+        recipients.forEach((frd) => {
+            SocketIoConfig.io.to(frd._id.toString()).emit('friend-login-status', {
+                status: 'offline',
+                sender: user._id
+            })
+            debug(`emitted logout to ${frd._id}`)
+        })
         
 
 

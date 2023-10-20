@@ -30,9 +30,10 @@ const FriendsTab = ({friendList, setFriendList, freeFriends, setFreeFriends, pen
             })
             //friend located
             console.log(response.data.message)
+            setFriendName('')
             if (response.data.success) {
                 const friend = response.data.friend
-                const inFrds = user.friends.some(obj => obj._id === friend._id)
+                const inFrds = response.data.friend.friends.some(obj => obj._id.toString() === friend._id.toString())
                 const inFreeFrds = freeFriends.some(obj => obj._id === friend._id)
                 const inPending = pendingRequests.some(obj => obj._id === friend._id)
                 //already friends

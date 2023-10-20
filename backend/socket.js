@@ -26,35 +26,33 @@ module.exports = (server) => {
 
         socket.on('joinRoom', (userId) => {
             socket.join(userId)
+            socket.to(userId).emit('joinnedRoom', {
+                room: userId
+            })
             console.log(`User ${userId} has joinned room ${userId}`)
         })
 
 
         socket.on('login-status', (sender) => {
-            
-            
-            
-                sender.friends.forEach((frd) => {
-                    console.log('friend Id from socket:', frd._id)
-                    console.log('sender', sender.sender, 'status:', sender.status)
-                    
-                    socket.to(frd._id).emit('friend-login-status', {
-                        sender: sender.sender,
-                        status: sender.status
-                    })
-                   
-                })
-                sender.freeFriends.forEach((frd) => {
-                    socket.to(frd._id).emit('friend-login-status', {
-                        sender: sender.sender,
-                        status: sender.status
-                    })
-                    
-    
-                    
-    
-                })
                 
+            const recipents = sender.friends.concat(sender.freeFriends)
+
+
+            recipents.forEach((frd) => {
+                console.log('friend Id from socket:', frd._id)
+                console.log('sender', sender.sender, 'status:', sender.status)
+                
+                socket.to(frd._id).emit('friend-login-status', {
+                    sender: sender.sender,
+                    status: sender.status
+                })
+            })
+
+           
+
+        
+             
+          
         
             
 

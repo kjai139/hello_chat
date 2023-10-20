@@ -29,9 +29,6 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
                 console.log(response.data.message)
             }
 
-            if (response.data.success) {
-                console.log(`friend ${friendId} deleted.`)
-            }
         } catch (err) {
             console.log(err)
         }

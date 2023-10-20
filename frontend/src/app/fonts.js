@@ -1,4 +1,4 @@
-import { Roboto_Mono, Montserrat, Josefin_Sans, Tilt_Neon } from "next/font/google"
+import { Roboto_Mono, Montserrat, Josefin_Sans, Tilt_Neon, Rubik } from "next/font/google"
 
 
 export const Robo = Roboto_Mono({
@@ -21,7 +21,7 @@ export const Josefin = Josefin_Sans({
     preload: true
 })
 
-export const TiltNeon = Tilt_Neon({
+export const TiltNeon = Rubik({
     subsets: ['latin'],
     display: 'swap',
 })

@@ -58,7 +58,7 @@ exports.user_friends_add_get = async (req, res) => {
     try {
         const normalizedUsername = req.query.name.toLowerCase()
 
-        const target = await User.find({normalized_name : normalizedUsername})
+        const target = await User.find({normalized_name : normalizedUsername}).populate('friends')
 
         if (target.length > 0) {
             res.json({
@@ -109,6 +109,9 @@ exports.user_fiends_add_post = async (req, res) => {
 
             target.friends = updatedFrds
             thefriend.friends = updatedFriendsFrds
+            SocketIoConfig.io.to(friendId).emit('addedByFrd', {
+                newFriend: target
+            })
             await target.save()
             await thefriend.save()
             res.json({
@@ -129,9 +132,10 @@ exports.user_fiends_sendRequest_post = async (req, res) => {
     try {
         const friendId = req.body.id
         const target = await User.findById(friendId)
+        const sender = await User.findById(req.user._id)
         // const requester = await User.findById(req.user._id)
 
-        const targetReqExist = target.friendRequests.some(obj => obj._id === req.user._id)
+        const targetReqExist = target.friendRequests.some(obj => obj._id.toString() === req.user._id.toString())
         // const requesterReqExist = requester.friendRequests.some(obj => obj._id === friendId)
 
         if (targetReqExist) {
@@ -143,7 +147,7 @@ exports.user_fiends_sendRequest_post = async (req, res) => {
             target.friendRequests = updatedPending
             await target.save()
             SocketIoConfig.io.to(friendId).emit('incFrdReq', {
-                newPending: req.user._id
+                newPending: sender
             })
             res.json({
                 success: true,
@@ -211,6 +215,10 @@ exports.user_friends_delete = async (req, res) => {
 
         await theUser.save()
         await theFriend.save()
+
+        SocketIoConfig.io.to(friendId).emit('deletedByFrd', {
+            deletedBy: req.user._id
+        })
 
         res.json({
             newUser: theUser,

@@ -48,7 +48,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         checkLoginStatus(pathname, router, setUser)
-        
+       
         
     }, [])
 
@@ -91,6 +91,40 @@ export default function Dashboard() {
             router.push('/')
         })
 
+        socket.on('joinnedRoom', (data) => {
+            console.log(`user joinned room ${data.room}`)
+        })
+
+        socket.on('incFrdReq', (data) => {
+            console.log(`received friendreq from ${data.newPending}/${data.newPending.username}`)
+            if (pendingFriends.length > 0) {
+                setPendingFriends(prev => [...prev, data.newPending])
+            } else {
+                setPendingFriends([data.newPending])
+            }
+        })
+
+        socket.on('deletedByFrd', (data) => {
+            console.log(`deleted by ${data.deletedBy}`)
+            setFriendList((prev) => {
+                return prev.filter((obj) => obj._id.toString() !== data.deletedBy.toString())
+            })
+        })
+
+        socket.on('addedByFrd', (data) => {
+            if (friendList.length > 0) {
+                setFriendList((prev) => [...prev, data.newFriend])
+                setSuggestedUsers((prev) => {
+                    return prev.filter((obj) => obj._id.toString() !== data.newFriend._id.toString())
+                })
+            } else {
+                setFriendList([data.newFriend])
+                setSuggestedUsers((prev) => {
+                    return prev.filter((obj) => obj._id.toString() !== data.newFriend._id.toString())
+                })
+            }
+        })
+
         socket.on('friend-login-status', (data) => {
             console.log(`${data.status} emit from login`, data)
             if (data.status === 'online') {
@@ -100,10 +134,19 @@ export default function Dashboard() {
                 setOnlineFriends((prev) => {
                     return prev.filter((id) => id !== data.sender)
                 })
-                socket.emit('redirectReq', {
-                    sender: data.sender
-                })
+                console.log('online frds after offline', onlineFriends)
+                
+               
             }
+        })
+
+        socket.on('friend-logout', (data) => {
+            console.log('RECEIVED FRIEND LOGOUT EMIT')
+        })
+
+        socket.on('reconnect', () => {
+            console.log('reconnected, joinning room')
+            socket.emit('joinRoom', user._id)
         })
         
         socket.on("disconnect", (reason) => {
@@ -120,6 +163,7 @@ export default function Dashboard() {
     useEffect(() => {
         if (user) {
             socket.emit('joinRoom', user._id)
+            
             
         }
     }, [user])
@@ -184,24 +228,20 @@ export default function Dashboard() {
     const signOut = async () => {
         const userId = user._id
         try {
-            const response = await axiosInstance.delete('api/auth/signout', {
+            const response = await axiosInstance.post('api/auth/signout', {
+                freeFriends: suggestedUsers,
+            }, {
                 withCredentials: true
             })
 
             if (response.data.ok) {
                 console.log('response data on logout', response.data.friends)
-
-                
-                socket.emit('login-status', {
-                    status: 'offline',
-                    freeFriends: suggestedUsers,
-                    friends: response.data.friends.friends,
-                    sender: response.data.friends._id
-                })
-                
-                
-                
                 setUser()
+                router.push('/')
+                
+                
+                
+                
                 
             }
 

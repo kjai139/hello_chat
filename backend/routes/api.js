@@ -21,7 +21,7 @@ router.get('/auth/check', isAuthenticated, auth_check_get)
 
 router.get('/users/get', isAuthenticated, user_check_get)
 
-router.delete('/auth/signout', isAuthenticated, auth_signout_delete)
+router.post('/auth/signout', isAuthenticated, auth_signout_delete)
 
 router.post('/messages/send', isAuthenticated, messages_post)
 
