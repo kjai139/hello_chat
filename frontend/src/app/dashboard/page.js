@@ -45,6 +45,9 @@ export default function Dashboard() {
     const [friendList, setFriendList] = useState([])
     const [pendingFriends, setPendingFriends] = useState([])
 
+    //unread
+    const [unreadMsg, setUnreadMsg] = useState([])
+
 
     useEffect(() => {
         checkLoginStatus(pathname, router, setUser)
@@ -53,7 +56,8 @@ export default function Dashboard() {
     }, [])
 
     useEffect(() => {
-        console.log(selectedUser, 'selected user on mount')
+        if (user) {
+            console.log(selectedUser, 'selected user on mount')
         if (!socket.connected) {
             socket.connect()
             
@@ -66,24 +70,49 @@ export default function Dashboard() {
         })
         socket.on('message', (data) => {
             console.log('received msg from ws:', data)
-            
-            setmessageArr(prev => {
-                if (!prev || prev.length === 0) {
-                    return [data]
+            // console.log('selected user:', selectedUser, 'hl', highlight, 'prev state', prevRefId)
+            // console.log(localStorage.getItem('lastSelected'), 'localstorage')
+            const curWindow = localStorage.getItem('lastSelected')
+            if (curWindow === data.sender._id.toString() || user._id === data.sender._id.toString()) {
+                setmessageArr(prev => {
+                    if (!prev || prev.length === 0) {
+                        return [data]
+                    } else {
+                        return [...prev, data]
+                    }
+                    
+                })
+            } else {
+                if (unreadMsg.length > 0) {
+                    setUnreadMsg(prev => [...prev, data])
+                    console.log('unread msg received')
                 } else {
-                    return [...prev, data]
+                    setUnreadMsg([data])
+                    console.log('new unread msg')
                 }
-                
-            })
+            }
+            
         })
         socket.on('sameUserMsg', (data) => {
-            console.log('received sameuserMsg from ws', data.content)
-            setmessageArr((prev) => {
-                const updatedMsgs = [...prev]
-                updatedMsgs[updatedMsgs.length - 1].content = data.content
-
-                return updatedMsgs
-            })
+            console.log('received sameuserMsg from ws', data.content, data)
+            const curWindow = localStorage.getItem('lastSelected')
+            if (curWindow === data.sender._id.toString() || user._id === data.sender._id.toString()) {
+                setmessageArr((prev) => {
+                    const updatedMsgs = [...prev]
+                    updatedMsgs[updatedMsgs.length - 1].content = data.content
+    
+                    return updatedMsgs
+                })
+            } else {
+                if (unreadMsg.length > 0) {
+                    setUnreadMsg(prev => [...prev, data])
+                    console.log('unread msg received')
+                } else {
+                    setUnreadMsg([data])
+                    console.log('new unread msg')
+                }
+            }
+            
         })
 
         socket.on('userLogged', (data) => {
@@ -128,8 +157,11 @@ export default function Dashboard() {
         socket.on('friend-login-status', (data) => {
             console.log(`${data.status} emit from login`, data)
             if (data.status === 'online') {
-                setOnlineFriends(prev => [...prev, data.sender])
+                if (!onlineFriends.some(obj => obj.toString() === data.sender.toString() )) {
+                    setOnlineFriends(prev => [...prev, data.sender])
                 console.log('online frds1 :', onlineFriends)
+                }
+                
             } else if (data.status === 'offline') {
                 setOnlineFriends((prev) => {
                     return prev.filter((id) => id !== data.sender)
@@ -158,7 +190,9 @@ export default function Dashboard() {
             
             socket.disconnect()
         }
-    }, [])
+        }
+        
+    }, [user])
 
     useEffect(() => {
         if (user) {
@@ -363,13 +397,14 @@ export default function Dashboard() {
             <div className="col-span-2 bg-ltgray flex flex-col text-white">
                 {user && selectedTab === 'chat' && <ChatWindow user={user} selectedUser={selectedUser} msgs={messageArr} setMsgs={setmessageArr} blankMsg={isBlank}></ChatWindow>}
                 {selectedTab === 'settings' && user &&
-                <Profile user={user}></Profile>
+                <Profile user={user} setUser={setUser}></Profile>
                 }
                 {selectedTab === 'friends' && user &&
                 <FriendsTab friendList={friendList} setFriendList={setFriendList} freeFriends={suggestedUsers} pendingRequests={pendingFriends} onlineUsers={onlineFriends} setPendingRequests={setPendingFriends} setFreeFriends={setSuggestedUsers}></FriendsTab>
                 }
 
             </div>
+            
             
         </main>
     )

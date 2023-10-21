@@ -21,7 +21,7 @@ exports.convo_get_post = async (req, res) => {
                 convo: convo[0]._id
             }).sort({
                 timestamp: 1
-            }).populate('sender')
+            }).limit(50).populate('sender')
 
             
             res.json({

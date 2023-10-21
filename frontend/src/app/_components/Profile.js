@@ -11,7 +11,7 @@ import Spinner from './Loader'
 
 
 
-const Profile = ({user}) => {
+const Profile = ({user, setUser}) => {
 
     const [selectedImageUrl, setSelectedImageUrl] = useState()
     const [resultMsg, setResultMsg] = useState('')
@@ -52,6 +52,7 @@ const Profile = ({user}) => {
                 console.log(response.data.message)
                 if (response.data.success) {
                     setIsLoading(false)
+                    setUser(response.data.updatedUser)
                     setResultMsg(response.data.message)
                 }
             } catch (err) {

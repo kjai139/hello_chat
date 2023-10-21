@@ -12,11 +12,12 @@ exports.message_edit = async (req, res) => {
 
         await prevMsg.save()
         debug('new msg:', prevMsg.content)
-        const newPrevMsg = await Message.findById(req.body.messageId)
+        const newPrevMsg = await Message.findById(req.body.messageId).populate('sender')
         SocketIoConfig.io.to(req.user._id).to(req.body.recipientId).emit('sameUserMsg', newPrevMsg)
 
         res.json({
-            success:true
+            success:true,
+            
         })
     } catch (err) {
         res.status(500).json({

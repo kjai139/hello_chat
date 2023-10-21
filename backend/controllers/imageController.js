@@ -37,7 +37,7 @@ exports.image_upload_post = async (req, res) => {
         const command = new PutObjectCommand(params)
         const response = await s3Client.send(command)
 
-        const targetUser = await User.findById(req.user._id)
+        const targetUser = await User.findById(req.user._id).populate('friends').populate('friendRequests')
         const olds3 = targetUser.image
         if (olds3) {
             const objKey = olds3.split('amazonaws.com/')[1]
@@ -55,7 +55,8 @@ exports.image_upload_post = async (req, res) => {
             await targetUser.save()
             res.json({
                 message: `User avatar updated.`,
-                success: true
+                success: true,
+                updatedUser: targetUser
             })
         } else {
             debug('fresh img saving to s3...')
@@ -63,7 +64,8 @@ exports.image_upload_post = async (req, res) => {
             await targetUser.save()
             res.json({
                 message: `User avatar updated.`,
-                success: true
+                success: true,
+                updatedUser: targetUser
             })
         }
 

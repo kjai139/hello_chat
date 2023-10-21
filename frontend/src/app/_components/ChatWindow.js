@@ -149,7 +149,8 @@ const ChatWindow = ({selectedUser, msgs, user, setMsgs, blankMsg}) => {
             }
             {msgs && msgs.map((node, idx) => {
                 // console.log(node, 'node')
-
+                
+                
                 let parsedDate = parseISO(node.timestamp)
 
                 let formattedTimestamp
