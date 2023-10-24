@@ -1,6 +1,8 @@
 
 
 const { Server } = require('socket.io')
+const User = require('./models/userModel')
+const debug = require('debug')('hello_chat:socket')
 
 let origin
 
@@ -23,13 +25,16 @@ module.exports = (server) => {
 
     io.on('connection', (socket) => {
         console.log('A user has connected.')
+        let openId
 
         socket.on('joinRoom', (userId) => {
+            openId = userId
             socket.join(userId)
             socket.to(userId).emit('joinnedRoom', {
                 room: userId
             })
-            console.log(`User ${userId} has joinned room ${userId}`)
+            console.log(`User ${openId} has joinned room ${userId}`)
+            debug(`user is in room` ,socket.rooms)
         })
 
 
@@ -67,8 +72,35 @@ module.exports = (server) => {
             console.log('socket rooms', socket.rooms)
         })
 
-        socket.on('disconnect', () => {
-            console.log('User disconnected')
+        socket.on('disconnect', async () => {
+            debug(`User ${openId} disconnected`)
+            const theUserId = openId
+
+            try {
+                const theUser = await User.findByIdAndUpdate(theUserId, {
+                    status: 'offline'
+                }).populate('friends')
+
+                for (const frd of theUser.friends) {
+                    try {
+                        socket.to(frd._id.toString()).emit('friend-login-status', {
+                            sender: theUser._id,
+                            status: 'offline'
+                        })
+
+                    } catch (err) {
+                        debug('error emitting on dc', err)
+                    }
+                }
+
+               
+
+
+                debug('user logged out on dc')
+            } catch (err){
+                debug('error logging user out on dc', err)
+            }
+            
             console.log('socket rooms size: ', socket.rooms.size)
         })
     })

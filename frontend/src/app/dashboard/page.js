@@ -56,6 +56,11 @@ export default function Dashboard() {
     }, [])
 
     useEffect(() => {
+        console.log('updated unreadMsg', unreadMsg)
+        console.log('online frds updated', onlineFriends)
+    }, [unreadMsg, onlineFriends])
+
+    useEffect(() => {
         if (user) {
             console.log(selectedUser, 'selected user on mount')
         if (!socket.connected) {
@@ -67,6 +72,7 @@ export default function Dashboard() {
 
         socket.on('connect', () => {
             console.log('client connected:', socket.id)
+            socket.emit('joinRoom', user._id)
         })
         socket.on('message', (data) => {
             console.log('received msg from ws:', data)
@@ -83,13 +89,18 @@ export default function Dashboard() {
                     
                 })
             } else {
-                if (unreadMsg.length > 0) {
-                    setUnreadMsg(prev => [...prev, data])
-                    console.log('unread msg received')
-                } else {
-                    setUnreadMsg([data])
-                    console.log('new unread msg')
-                }
+                setUnreadMsg((prev) => {
+                    if (prev.length > 0) {
+                        console.log('prev > 0 unread')
+                        return [...prev, data]
+                        
+                    } else {
+                        console.log('unread blank')
+                       return [data]
+                        
+                    }
+                })
+                
             }
             
         })
@@ -104,13 +115,18 @@ export default function Dashboard() {
                     return updatedMsgs
                 })
             } else {
-                if (unreadMsg.length > 0) {
-                    setUnreadMsg(prev => [...prev, data])
-                    console.log('unread msg received')
-                } else {
-                    setUnreadMsg([data])
-                    console.log('new unread msg')
-                }
+                setUnreadMsg((prev) => {
+                    if (prev.length > 0) {
+                        console.log('unread same msg len > 0 received', prev.length)
+                        return [...prev, data]
+                        
+                    } else {
+                        console.log('new unread same msg 0')
+                        return [data]
+                        
+                    }
+                })
+                
             }
             
         })
@@ -159,14 +175,14 @@ export default function Dashboard() {
             if (data.status === 'online') {
                 if (!onlineFriends.some(obj => obj.toString() === data.sender.toString() )) {
                     setOnlineFriends(prev => [...prev, data.sender])
-                console.log('online frds1 :', onlineFriends)
+                
                 }
                 
             } else if (data.status === 'offline') {
                 setOnlineFriends((prev) => {
-                    return prev.filter((id) => id !== data.sender)
+                    return prev.filter((id) => id.toString() !== data.sender.toString())
                 })
-                console.log('online frds after offline', onlineFriends)
+                
                 
                
             }
@@ -176,10 +192,7 @@ export default function Dashboard() {
             console.log('RECEIVED FRIEND LOGOUT EMIT')
         })
 
-        socket.on('reconnect', () => {
-            console.log('reconnected, joinning room')
-            socket.emit('joinRoom', user._id)
-        })
+        
         
         socket.on("disconnect", (reason) => {
             console.log('dc reason', reason)
