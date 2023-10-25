@@ -40,8 +40,11 @@ module.exports = (server) => {
         
         
 
-        socket.on('joinRoom', (userId) => {
+        socket.on('joinRoom', async (userId) => {
             users.set(socket.id, userId)
+            const theUser = await User.findByIdAndUpdate(userId, {
+                status:'online'
+            })
             socket.join(userId)
             socket.to(userId).emit('joinnedRoom', {
                 room: userId
@@ -97,7 +100,7 @@ module.exports = (server) => {
 
                 
 
-                if (theUser.friends && theUser.friends.length > 0) {
+                if (theUser && theUser.friends.length > 0) {
                     debug('USER FRIENDS IN DC:', theUser.friends)
                     for (const frd of theUser.friends) {
                         try {
@@ -110,6 +113,8 @@ module.exports = (server) => {
                             debug('error emitting on dc', err)
                         }
                     }
+                } else {
+                    debug('OFFLINE EMIT FAILED TO SEND')
                 }
 
                 
@@ -117,7 +122,7 @@ module.exports = (server) => {
                
 
 
-                debug('user logged out on dc')
+                
             } catch (err){
                 debug('error logging user out on dc', err)
             }

@@ -5,7 +5,7 @@ import UserPortrait from '../../../svgs/userPortrait.svg'
 import { Robo } from '../fonts'
 
 
-const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggestedUsers, onlineUsers, friendList, setFriendList, unreadMsg}) => {
+const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggestedUsers, onlineUsers, friendList, setFriendList, unreadMsg, offlineFriends}) => {
 
     
 
@@ -126,7 +126,7 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
                              :
                              <UserPortrait fill={node.defaultColor} className="portrait-img"></UserPortrait>
                              }
-                             <span className={node.status === 'online' || onlineUsers.includes(node._id) ? `status-indi` : `status-indi offline`}></span>
+                             <span className={(node.status === 'online' || onlineUsers.includes(node._id)) && !offlineFriends.includes(node._id) ? `status-indi` : `status-indi offline`}></span>
                              {countUnread(node._id) > 0 && 
                              <span className='unread-counter'>{countUnread(node._id)}</span>
                              }
@@ -155,7 +155,7 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
                          :
                          <UserPortrait fill={node.defaultColor} className="portrait-img"></UserPortrait>
                          }
-                         <span className={node.status === 'online' || onlineUsers.includes(node._id) ? `status-indi` : `status-indi offline`}></span>
+                         <span className={(node.status === 'online' || onlineUsers.includes(node._id)) && !offlineFriends.includes(node._id)  ? `status-indi` : `status-indi offline`}></span>
                          {countUnread(node._id) > 0 && 
                             <span className='unread-counter'>{countUnread(node._id)}</span>
                             }

@@ -40,6 +40,7 @@ export default function Dashboard() {
     const [suggestedUsers, setSuggestedUsers] = useState()
     
     const [onlineFriends, setOnlineFriends] = useState([])
+    const [offlineFriends, setOfflineFriends] = useState([])
 
     //real friendlist
     const [friendList, setFriendList] = useState([])
@@ -58,7 +59,8 @@ export default function Dashboard() {
     useEffect(() => {
         console.log('updated unreadMsg', unreadMsg)
         console.log('online frds updated', onlineFriends)
-    }, [unreadMsg, onlineFriends])
+        console.log('offline friends', offlineFriends)
+    }, [unreadMsg, onlineFriends, offlineFriends])
 
     useEffect(() => {
         if (user) {
@@ -71,8 +73,13 @@ export default function Dashboard() {
         }
 
         socket.on('connect', () => {
+            
+
+            
             console.log('client connected:', socket.id)
-            socket.emit('joinRoom', user._id)
+            // socket.emit('joinRoom', user._id)
+            
+            
         })
         socket.on('message', (data) => {
             console.log('received msg from ws:', data)
@@ -177,11 +184,20 @@ export default function Dashboard() {
                     setOnlineFriends(prev => [...prev, data.sender])
                 
                 }
+                setOfflineFriends((prev) => {
+                    return prev.filter((id) => id.toString() !== data.sender.toString())
+                })
                 
             } else if (data.status === 'offline') {
                 setOnlineFriends((prev) => {
                     return prev.filter((id) => id.toString() !== data.sender.toString())
                 })
+                if (!offlineFriends.some(obj => obj.toString() === data.sender.toString() ) && offlineFriends.length === 0) {
+                    setOfflineFriends([data.sender])
+                
+                } else if (!offlineFriends.some(obj => obj.toString() === data.sender.toString() ) && offlineFriends.length > 0) {
+                    setOfflineFriends(prev => [...prev, data.sender])
+                }
                 
                 
                
@@ -409,7 +425,7 @@ export default function Dashboard() {
             <div className="bg-lgray text-white flex flex-col items-center">
                 <span className={`text-sm w-full p-4 `}>DIRECT MESSAGES</span>
                 
-                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers} onlineUsers={onlineFriends} friendList={friendList} setFriendList={setFriendList} unreadMsg={unreadMsg}></DirectMessages>
+                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers} onlineUsers={onlineFriends} friendList={friendList} setFriendList={setFriendList} unreadMsg={unreadMsg} offlineFriends={offlineFriends}></DirectMessages>
                 
 
             </div>
