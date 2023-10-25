@@ -20,7 +20,12 @@ module.exports = {
       fontSize: {
         '2xl': '1.5rem',
         '3xl': '2rem',
+      
+
         
+      },
+      spacing: {
+        '12px': '12px',
       },
       boxShadow: {
         'cont': 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;'

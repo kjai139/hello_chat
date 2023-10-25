@@ -90,7 +90,7 @@ export default function Dashboard() {
                 })
             } else {
                 setUnreadMsg((prev) => {
-                    if (prev.length > 0) {
+                    if (prev && prev.length > 0) {
                         console.log('prev > 0 unread')
                         return [...prev, data]
                         
@@ -116,7 +116,7 @@ export default function Dashboard() {
                 })
             } else {
                 setUnreadMsg((prev) => {
-                    if (prev.length > 0) {
+                    if (prev && prev.length > 0) {
                         console.log('unread same msg len > 0 received', prev.length)
                         return [...prev, data]
                         
@@ -312,6 +312,12 @@ export default function Dashboard() {
         setSelectedUser(user)
         setIsBlank(false)
         setmessageArr(null)
+        setUnreadMsg((prev) => {
+            if (prev && prev.length > 0) {
+                prev.filter((obj) => obj._id.toString() !== user._id.toString())
+            }
+            
+        })
         console.log(user, 'selected')
         try {
             const response = await axiosInstance.post('api/convo/get', {
@@ -403,7 +409,7 @@ export default function Dashboard() {
             <div className="bg-lgray text-white flex flex-col items-center">
                 <span className={`text-sm w-full p-4 `}>DIRECT MESSAGES</span>
                 
-                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers} onlineUsers={onlineFriends} friendList={friendList} setFriendList={setFriendList}></DirectMessages>
+                <DirectMessages onSelect={selectUser} setHL={setHighlight} highlight={highlight} prevTab={prevRefId} prevRef={tabRef} suggestedUsers={suggestedUsers} onlineUsers={onlineFriends} friendList={friendList} setFriendList={setFriendList} unreadMsg={unreadMsg}></DirectMessages>
                 
 
             </div>

@@ -18,22 +18,35 @@ module.exports = (server) => {
             origin: origin,
             methods: ['GET', 'POST'],
             credentials: true
+        },
+        connectionStateRecovery: {
+            maxDisconnectionDuration: 2 * 60 * 1000,
+            skipMiddlewares: true,
         }
     })
 
-    
+    const users = new Map()
 
     io.on('connection', (socket) => {
-        console.log('A user has connected.')
-        let openId
+        if (socket.recovered) {
+            debug('RECOVERY SUCCESSFUL, USER RECOVERED:', socket.id)
+            debug('ROOMS:', socket.rooms)
+            debug('SOCKET.DATA', socket.data)
+        } else {
+            debug('NEW CONNECTION:', socket.id)
+            debug('ROOMS:', socket.rooms)
+            debug('SOCKET.DATA', socket.data)
+        }
+        
+        
 
         socket.on('joinRoom', (userId) => {
-            openId = userId
+            users.set(socket.id, userId)
             socket.join(userId)
             socket.to(userId).emit('joinnedRoom', {
                 room: userId
             })
-            console.log(`User ${openId} has joinned room ${userId}`)
+            console.log(`User ${socket.id}} has joinned room ${userId}`)
             debug(`user is in room` ,socket.rooms)
         })
 
@@ -73,25 +86,33 @@ module.exports = (server) => {
         })
 
         socket.on('disconnect', async () => {
-            debug(`User ${openId} disconnected`)
-            const theUserId = openId
+            
+            const theUserId = users.get(socket.id)
+            debug(`User ${theUserId} disconnected`)
 
             try {
                 const theUser = await User.findByIdAndUpdate(theUserId, {
                     status: 'offline'
                 }).populate('friends')
 
-                for (const frd of theUser.friends) {
-                    try {
-                        socket.to(frd._id.toString()).emit('friend-login-status', {
-                            sender: theUser._id,
-                            status: 'offline'
-                        })
+                
 
-                    } catch (err) {
-                        debug('error emitting on dc', err)
+                if (theUser.friends && theUser.friends.length > 0) {
+                    debug('USER FRIENDS IN DC:', theUser.friends)
+                    for (const frd of theUser.friends) {
+                        try {
+                            socket.to(frd._id.toString()).emit('friend-login-status', {
+                                sender: theUser._id,
+                                status: 'offline'
+                            })
+    
+                        } catch (err) {
+                            debug('error emitting on dc', err)
+                        }
                     }
                 }
+
+                
 
                
 

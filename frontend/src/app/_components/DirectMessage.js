@@ -5,7 +5,7 @@ import UserPortrait from '../../../svgs/userPortrait.svg'
 import { Robo } from '../fonts'
 
 
-const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggestedUsers, onlineUsers, friendList, setFriendList}) => {
+const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggestedUsers, onlineUsers, friendList, setFriendList, unreadMsg}) => {
 
     
 
@@ -32,6 +32,17 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
         } catch (err) {
             console.log(err)
         }
+    }
+
+    const countUnread = (Id) => {
+        if (unreadMsg && unreadMsg.length > 0)  {
+            let count = unreadMsg.reduce((counter, obj) => {
+                return obj.sender._id.toString() === Id.toString() ? counter + 1 : counter
+            }, 0)
+            console.log('IN COUNTER FUNC', count)
+            return count
+        }
+        
     }
 
     
@@ -116,6 +127,9 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
                              <UserPortrait fill={node.defaultColor} className="portrait-img"></UserPortrait>
                              }
                              <span className={node.status === 'online' || onlineUsers.includes(node._id) ? `status-indi` : `status-indi offline`}></span>
+                             {countUnread(node._id) > 0 && 
+                             <span className='unread-counter'>{countUnread(node._id)}</span>
+                             }
                              </div>
                              <span>{node.username}</span>
                              
@@ -142,6 +156,9 @@ const DirectMessages = ({onSelect, highlight, setHL, prevTab, prevRef, suggested
                          <UserPortrait fill={node.defaultColor} className="portrait-img"></UserPortrait>
                          }
                          <span className={node.status === 'online' || onlineUsers.includes(node._id) ? `status-indi` : `status-indi offline`}></span>
+                         {countUnread(node._id) > 0 && 
+                            <span className='unread-counter'>{countUnread(node._id)}</span>
+                            }
                          </div>
                          <span>{node.username}</span>
                      </div>

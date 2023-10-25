@@ -104,6 +104,8 @@ background-size: cover;
   right: 0px;
 }
 
+
+
 .status-indi.offline {
   background-color: #94a3b8;
   border: 2px solid var(--offlineC);
@@ -148,6 +150,10 @@ background-size: cover;
 
   .fl-btn {
     @apply text-xs hover:text-red-500
+  }
+
+  .unread-counter {
+    @apply absolute left-[-10px] w-4 h-4 bottom-0 text-red-500 font-bold
   }
 
   
